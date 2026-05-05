@@ -1,163 +1,707 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ekenved - Fjällboende</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Hair Changer — Verktygsanalys</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0D0B09; --surface: #161310; --card: #1E1A16;
+      --border: rgba(210,175,120,0.15); --gold: #C9A96E; --gold-light: #E8C98A;
+      --text: #F0EAE0; --muted: #8A7F70; --accent: #D4714A; --green: #6BAF7A;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+    body::after {
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9999; mix-blend-mode: overlay; opacity: 0.4;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+    }
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; display: flex; align-items: center;
+      justify-content: space-between; padding: 18px 56px;
+      background: rgba(13,11,9,0.85); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border); z-index: 500;
+    }
+    .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 600; color: var(--gold); }
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a { text-decoration: none; color: var(--muted); font-size: 0.78rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--gold-light); }
 
-<style>
-:root {
-    --main-color: #1f2f2f;
-    --accent-color: #6b8e23;
-}
+    .hero {
+      min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; text-align: center; padding: 140px 48px 80px; position: relative; overflow: hidden;
+    }
+    .hero-glow {
+      position: absolute; width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(201,169,110,0.07) 0%, transparent 65%);
+      border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%,-50%); pointer-events: none;
+    }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 10px; font-size: 0.72rem; font-weight: 500;
+      letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold);
+      background: rgba(201,169,110,0.08); border: 1px solid rgba(201,169,110,0.2);
+      padding: 8px 20px; border-radius: 40px; margin-bottom: 32px;
+      animation: fadeDown 0.8s ease both;
+    }
+    @keyframes fadeDown { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
+    .hero h1 {
+      font-family: 'Cormorant Garamond', serif; font-size: clamp(3.5rem, 7vw, 7rem);
+      font-weight: 300; line-height: 1.0; letter-spacing: -0.02em; margin-bottom: 12px;
+      animation: fadeDown 0.9s 0.1s ease both;
+    }
+    .hero h1 em { font-style: italic; color: var(--gold-light); }
+    .hero-sub {
+      font-family: 'Cormorant Garamond', serif; font-size: clamp(1.1rem, 2.5vw, 1.7rem);
+      font-style: italic; color: var(--muted); margin-bottom: 32px;
+      animation: fadeDown 1s 0.2s ease both;
+    }
+    .hero-desc {
+      max-width: 560px; font-size: 0.98rem; line-height: 1.8; color: var(--muted);
+      margin-bottom: 44px; animation: fadeDown 1s 0.3s ease both;
+    }
+    .hero-chips {
+      display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+      animation: fadeDown 1s 0.4s ease both;
+    }
+    .chip { font-size: 0.78rem; font-weight: 500; padding: 8px 18px; border-radius: 2px; border: 1px solid var(--border); color: var(--muted); }
+    .chip.gold { border-color: rgba(201,169,110,0.4); color: var(--gold); }
+    .scroll-hint {
+      position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      color: var(--muted); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce { 0%,100% { transform:translateX(-50%) translateY(0); } 50% { transform:translateX(-50%) translateY(6px); } }
+    .scroll-line { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--gold), transparent); }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+    section { padding: 96px 56px; max-width: 1120px; margin: 0 auto; }
+    .section-label {
+      display: flex; align-items: center; gap: 14px; font-size: 0.7rem; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); margin-bottom: 24px;
+    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    h2 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.2rem, 4vw, 3.4rem); font-weight: 300; line-height: 1.1; margin-bottom: 20px; }
+    h2 em { font-style: italic; color: var(--gold-light); }
+    .lead { font-size: 1rem; line-height: 1.8; color: var(--muted); max-width: 680px; margin-bottom: 48px; }
 
-body {
-    font-family: 'Segoe UI', sans-serif;
-    background: #f4f4f4;
-    color: #333;
-}
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: var(--border); border: 1px solid var(--border); }
+    .about-cell { background: var(--card); padding: 40px; }
+    .about-cell h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 600; margin-bottom: 12px; color: var(--gold-light); }
+    .about-cell p { font-size: 0.9rem; line-height: 1.75; color: var(--muted); }
+    .about-cell .icon { font-size: 2rem; margin-bottom: 16px; }
 
-/* HEADER */
-header {
-    height: 90vh;
-    background: url("images/bild1.jpg") center/cover no-repeat;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: white;
-}
+    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; background: var(--border); border: 1px solid var(--border); margin-top: 48px; }
+    .step { background: var(--card); padding: 36px 24px; position: relative; transition: background 0.3s; }
+    .step:hover { background: var(--surface); }
+    .step-num { font-family: 'Cormorant Garamond', serif; font-size: 3.5rem; font-weight: 300; color: rgba(201,169,110,0.1); line-height: 1; margin-bottom: 16px; }
+    .step h4 { font-size: 0.88rem; font-weight: 600; margin-bottom: 10px; }
+    .step p { font-size: 0.82rem; line-height: 1.65; color: var(--muted); }
+    .step-icon { position: absolute; top: 24px; right: 24px; font-size: 1.3rem; }
 
-header div {
-    background: rgba(0,0,0,0.5);
-    padding: 30px;
-    border-radius: 10px;
-}
+    .audience-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 48px; }
+    .audience-card { background: var(--card); border: 1px solid var(--border); padding: 32px 26px; border-radius: 2px; transition: border-color 0.3s, transform 0.3s; }
+    .audience-card:hover { border-color: rgba(201,169,110,0.35); transform: translateY(-4px); }
+    .audience-emoji { font-size: 2rem; margin-bottom: 14px; }
+    .audience-card h4 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 600; color: var(--gold-light); margin-bottom: 10px; }
+    .audience-card p { font-size: 0.84rem; line-height: 1.7; color: var(--muted); }
 
-header h1 {
-    font-size: 3rem;
-}
+    .features-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; margin-top: 48px; }
+    .feature-list { display: flex; flex-direction: column; gap: 0; }
+    .feature-item { display: flex; align-items: flex-start; gap: 20px; padding: 22px 0; border-bottom: 1px solid var(--border); }
+    .feature-item:first-child { border-top: 1px solid var(--border); }
+    .feat-dot { width: 8px; height: 8px; background: var(--gold); border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+    .feature-item strong { display: block; font-size: 0.88rem; font-weight: 600; margin-bottom: 4px; }
+    .feature-item span { font-size: 0.82rem; line-height: 1.65; color: var(--muted); }
 
-header p {
-    margin-top: 10px;
-}
+    .limits-table { width: 100%; border-collapse: collapse; margin-top: 48px; }
+    .limits-table th { text-align: left; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); padding: 14px 20px; border-bottom: 1px solid var(--border); background: var(--surface); }
+    .limits-table td { padding: 16px 20px; font-size: 0.86rem; line-height: 1.6; color: var(--muted); border-bottom: 1px solid rgba(210,175,120,0.07); vertical-align: top; }
+    .limits-table tr:hover td { background: var(--card); }
+    .badge { display: inline-block; font-size: 0.68rem; font-weight: 600; padding: 3px 10px; border-radius: 2px; letter-spacing: 0.06em; }
+    .badge-warn { background: rgba(212,113,74,0.15); color: var(--accent); border: 1px solid rgba(212,113,74,0.25); }
+    .badge-ok   { background: rgba(107,175,122,0.12); color: var(--green); border: 1px solid rgba(107,175,122,0.25); }
+    .badge-info { background: rgba(201,169,110,0.1); color: var(--gold); border: 1px solid rgba(201,169,110,0.2); }
 
-/* NAV */
-nav {
-    background: white;
-    padding: 15px;
-    text-align: center;
-    position: sticky;
-    top: 0;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
+    .process-timeline { margin-top: 56px; display: flex; flex-direction: column; }
+    .process-step { display: grid; grid-template-columns: 80px 1fr; gap: 32px; padding: 40px 0; border-bottom: 1px solid var(--border); }
+    .process-step:last-child { border-bottom: none; }
+    .process-num { font-family: 'Cormorant Garamond', serif; font-size: 3rem; font-weight: 300; color: var(--gold); line-height: 1; padding-top: 4px; }
+    .process-content h4 { font-size: 1rem; font-weight: 600; margin-bottom: 10px; }
+    .process-content p { font-size: 0.88rem; line-height: 1.75; color: var(--muted); margin-bottom: 16px; }
 
-nav a {
-    margin: 0 15px;
-    text-decoration: none;
-    color: var(--main-color);
-    font-weight: bold;
-}
+    .mockup { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; margin-top: 16px; }
+    .mockup-bar { background: var(--surface); padding: 10px 16px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border); }
+    .mockup-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .mockup-url { flex: 1; background: var(--card); border-radius: 4px; padding: 4px 12px; font-size: 0.72rem; color: var(--muted); text-align: center; }
+    .mockup-body { padding: 24px; min-height: 140px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; color: var(--muted); flex-direction: column; gap: 10px; text-align: center; }
 
-nav a:hover {
-    color: var(--accent-color);
-}
+    .eval-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 48px; }
+    .eval-card { background: var(--card); border: 1px solid var(--border); padding: 32px; border-radius: 2px; }
+    .eval-card.positive { border-top: 3px solid var(--green); }
+    .eval-card.negative { border-top: 3px solid var(--accent); }
+    .eval-card h4 { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 20px; }
+    .eval-card.positive h4 { color: var(--green); }
+    .eval-card.negative h4 { color: var(--accent); }
+    .eval-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .eval-list li { display: flex; gap: 12px; font-size: 0.86rem; line-height: 1.6; color: var(--muted); }
+    .eval-list li::before { content: '→'; color: var(--gold); flex-shrink: 0; font-size: 0.8rem; margin-top: 2px; }
 
-/* SECTIONS */
-section {
-    padding: 60px 20px;
-    max-width: 1000px;
-    margin: auto;
-}
+    .rating-bar { display: flex; flex-direction: column; gap: 16px; margin-top: 48px; }
+    .rating-row { display: grid; grid-template-columns: 180px 1fr 40px; align-items: center; gap: 16px; }
+    .rating-label { font-size: 0.82rem; color: var(--muted); font-weight: 500; }
+    .rating-track { height: 4px; background: var(--surface); border-radius: 2px; overflow: hidden; }
+    .rating-fill { height: 100%; background: linear-gradient(to right, var(--gold), var(--gold-light)); border-radius: 2px; }
+    .rating-score { font-size: 0.82rem; font-weight: 600; color: var(--gold); text-align: right; }
 
-h2 {
-    margin-bottom: 20px;
-    color: var(--main-color);
-}
+    .divider { border: none; border-top: 1px solid var(--border); margin: 0 56px; }
 
-/* GALLERY */
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 15px;
-}
+    footer { padding: 60px 56px 40px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 24px; }
+    .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 300; color: var(--gold); }
+    footer p { font-size: 0.78rem; color: var(--muted); line-height: 1.7; max-width: 400px; }
+    .footer-right { text-align: right; font-size: 0.75rem; color: var(--muted); line-height: 1.8; }
 
-.grid img {
-    width: 100%;
-    border-radius: 12px;
-    transition: transform 0.3s;
-}
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
 
-.grid img:hover {
-    transform: scale(1.05);
-}
-
-/* CONTACT */
-.contact-box {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-}
-
-/* FOOTER */
-footer {
-    background: var(--main-color);
-    color: white;
-    text-align: center;
-    padding: 20px;
-}
-</style>
-
+    @media (max-width: 768px) {
+      nav { padding: 16px 20px; } .nav-links { display: none; }
+      section { padding: 64px 24px; } .hero { padding: 110px 24px 60px; }
+      .about-grid, .steps, .audience-grid, .features-layout, .eval-grid { grid-template-columns: 1fr; }
+      .steps { grid-template-columns: 1fr 1fr; }
+      .process-step { grid-template-columns: 50px 1fr; gap: 20px; }
+      footer { padding: 40px 24px; flex-direction: column; align-items: flex-start; }
+      .footer-right { text-align: left; } .divider { margin: 0 24px; }
+      .rating-row { grid-template-columns: 130px 1fr 36px; }
+    }
+  </style>
 </head>
 <body>
 
-<header>
-    <div>
-        <h1>Ekenved</h1>
-        <p>Naturnära boende i Storfjäten, Idre</p>
-    </div>
-</header>
-
 <nav>
-    <a href="#about">Om</a>
-    <a href="#gallery">Bilder</a>
-    <a href="#contact">Kontakt</a>
+  <div class="nav-logo">AI Hair Changer</div>
+  <ul class="nav-links">
+    <li><a href="#om">Om verktyget</a></li>
+    <li><a href="#anvandning">Användning</a></li>
+    <li><a href="#malgrupp">Målgrupp</a></li>
+    <li><a href="#begransningar">Begränsningar</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#utvardering">Utvärdering</a></li>
+  </ul>
 </nav>
 
-<section id="about">
-    <h2>Om boendet</h2>
-    <p>
-        Välkommen till Ekenved – en plats för lugn, natur och återhämtning.
-        Här bor du nära fjällen med tillgång till skidåkning, vandring och fantastisk natur året runt.
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-tag">🎓 Skoluppgift — AI-verktygsanalys</div>
+  <h1>AI <em>Hair</em><br>Changer</h1>
+  <p class="hero-sub">Testa frisyrer virtuellt med artificiell intelligens</p>
+  <p class="hero-desc">En djupdykning i ett AI-drivet verktyg som låter vem som helst prova över 100 olika frisyrer och hårfärger — utan att sätta en fot på en salong.</p>
+  <div class="hero-chips">
+    <span class="chip gold">Gratis att prova</span>
+    <span class="chip">100+ frisyrer</span>
+    <span class="chip">Integritetsskyddat</span>
+    <span class="chip">Ingen registrering</span>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    Scrolla
+  </div>
+</div>
+
+<hr class="divider" />
+
+<!-- 01 OM VERKTYGET -->
+<section id="om">
+  <div class="section-label reveal">01 — Om verktyget</div>
+  <h2 class="reveal">Vad är <em>AI Hair Changer?</em></h2>
+  <p class="lead reveal">AI Hair Changer är ett webbaserat verktyg som använder avancerad bildgenerering och artificiell intelligens för att låta användare prova olika frisyrer och hårfärger virtuellt — direkt i webbläsaren, utan installation.</p>
+
+  <div class="about-grid reveal">
+    <div class="about-cell">
+      <div class="icon">🏢</div>
+      <h3>Skapare & bakgrund</h3>
+      <p>Verktyget drivs av teamet bakom <strong style="color:var(--text)">aihairchanger.io</strong>. Det är ett av många AI-bildverktyg som vuxit fram när generativa modeller blivit tillgängliga för konsumenter. Exakt teknik och organisation publiceras inte öppet, vilket är vanligt bland webbaserade AI-tjänster i den här kategorin.</p>
+    </div>
+    <div class="about-cell">
+      <div class="icon">🎯</div>
+      <h3>Syfte & nytta</h3>
+      <p>Syftet är att eliminera risken med att byta frisyr. Istället för att gissa hur man kommer se ut kan man ladda upp ett foto och direkt förhandsgranska hundratals stilar. Verktyget hjälper till att fatta välgrundade frisyrbeslut — utan att behöva ta steget till frisören först.</p>
+    </div>
+    <div class="about-cell">
+      <div class="icon">⚙️</div>
+      <h3>Tekniken bakom</h3>
+      <p>Verktyget använder <em style="color:var(--gold)">generativ AI</em> — sannolikt diffusionsmodeller (liknande tekniken bakom Stable Diffusion eller DALL·E). AI:n analyserar ansiktsform och hårstruktur och applicerar sedan nya frisyrer på ett hyperrealistiskt vis som ska likna riktiga fotografier.</p>
+    </div>
+    <div class="about-cell">
+      <div class="icon">🔐</div>
+      <h3>Integritet & säkerhet</h3>
+      <p>Uppladdade foton raderas automatiskt efter <strong style="color:var(--text)">24 timmar</strong>. Ingen registrering eller inloggning krävs för grundfunktionerna. Detta minskar insamlingen av personuppgifter och gör verktyget mer tillgängligt och integritetsvänligt.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- 02 ANVÄNDNING -->
+<section id="anvandning">
+  <div class="section-label reveal">02 — Hur det används</div>
+  <h2 class="reveal">Fyra enkla <em>steg</em></h2>
+  <p class="lead reveal">Verktyget kräver inga tekniska kunskaper. Processen tar under en minut och är uppdelad i fyra tydliga steg.</p>
+
+  <div class="steps reveal">
+    <div class="step">
+      <span class="step-icon">📸</span>
+      <div class="step-num">01</div>
+      <h4>Ladda upp foto</h4>
+      <p>Välj ett tydligt foto — helst framifrån med bra belysning. Ansiktet ska vara klart synligt för bästa resultat.</p>
+    </div>
+    <div class="step">
+      <span class="step-icon">🎭</span>
+      <div class="step-num">02</div>
+      <h4>Välj tillfälle</h4>
+      <p>Filtrera stilar efter tillfälle: arbete, bröllop, dejt, vardag eller festlighet. Välj också kön för bättre relevans.</p>
+    </div>
+    <div class="step">
+      <span class="step-icon">✂️</span>
+      <div class="step-num">03</div>
+      <h4>Välj frisyr & färg</h4>
+      <p>Bläddra bland 100+ frisyrstilar och kombinera med ett brett urval hårfärger — från naturliga till djärva.</p>
+    </div>
+    <div class="step">
+      <span class="step-icon">✨</span>
+      <div class="step-num">04</div>
+      <h4>Generera & spara</h4>
+      <p>AI:n skapar resultatet omedelbart. Ladda ner bilden eller dela den direkt med din frisör som referens.</p>
+    </div>
+  </div>
+
+  <!-- Mockup: Startsidan -->
+  <div class="reveal" style="margin-top:48px;">
+    <p style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">📸 Illustration: Gränssnittet på startsidan</p>
+    <div class="mockup">
+      <div class="mockup-bar">
+        <div class="mockup-dot" style="background:#E8634A;"></div>
+        <div class="mockup-dot" style="background:#D4A017;"></div>
+        <div class="mockup-dot" style="background:#6BAF7A;"></div>
+        <div class="mockup-url">aihairchanger.io</div>
+      </div>
+      <div class="mockup-body" style="min-height:200px;gap:16px;">
+        <div style="font-size:2.5rem;">💇‍♀️</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--text);">AI Hair Changer</div>
+        <div style="font-size:0.82rem;color:var(--muted);max-width:320px;line-height:1.6;">Central uppladdningsruta med drag-and-drop. Tydlig uppmaning: <em style="color:var(--gold)">"Upload your photo to get started"</em></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
+          <span style="background:var(--bg);border:1px solid var(--border);padding:6px 14px;border-radius:2px;font-size:0.72rem;color:var(--muted);">👩 Female</span>
+          <span style="background:var(--bg);border:1px solid var(--gold);padding:6px 14px;border-radius:2px;font-size:0.72rem;color:var(--gold);">💍 Wedding</span>
+          <span style="background:var(--bg);border:1px solid var(--border);padding:6px 14px;border-radius:2px;font-size:0.72rem;color:var(--muted);">🌊 Wavy</span>
+          <span style="background:var(--bg);border:1px solid var(--border);padding:6px 14px;border-radius:2px;font-size:0.72rem;color:var(--muted);">🎨 Blonde</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mockup: Resultat -->
+  <div class="reveal" style="margin-top:20px;">
+    <p style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">✨ Illustration: Resultatvyn efter AI-generering</p>
+    <div class="mockup">
+      <div class="mockup-bar">
+        <div class="mockup-dot" style="background:#E8634A;"></div>
+        <div class="mockup-dot" style="background:#D4A017;"></div>
+        <div class="mockup-dot" style="background:#6BAF7A;"></div>
+        <div class="mockup-url">aihairchanger.io/result</div>
+      </div>
+      <div style="padding:24px;display:flex;gap:16px;align-items:stretch;flex-wrap:wrap;">
+        <div style="flex:1;min-width:120px;background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:16px;display:flex;flex-direction:column;gap:8px;">
+          <div style="font-size:0.66rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;">Originalfoto</div>
+          <div style="flex:1;background:var(--surface);border-radius:2px;min-height:100px;display:flex;align-items:center;justify-content:center;font-size:2rem;">🧑</div>
+        </div>
+        <div style="display:flex;align-items:center;color:var(--gold);font-size:1.4rem;padding:0 4px;">→</div>
+        <div style="flex:2;min-width:160px;background:var(--bg);border:1px solid var(--gold);border-radius:3px;padding:16px;display:flex;flex-direction:column;gap:8px;">
+          <div style="font-size:0.66rem;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;">AI-genererat resultat</div>
+          <div style="flex:1;background:linear-gradient(135deg,var(--surface),var(--card));border-radius:2px;min-height:100px;display:flex;align-items:center;justify-content:center;font-size:2rem;">💇‍♀️</div>
+          <div style="display:flex;gap:8px;">
+            <div style="flex:1;background:var(--surface);padding:8px;border-radius:2px;font-size:0.7rem;color:var(--green);text-align:center;">⬇ Ladda ner</div>
+            <div style="flex:1;background:var(--surface);padding:8px;border-radius:2px;font-size:0.7rem;color:var(--muted);text-align:center;">↗ Dela</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- 03 MÅLGRUPP -->
+<section id="malgrupp">
+  <div class="section-label reveal">03 — Målgrupp</div>
+  <h2 class="reveal">Vem är verktyget<br><em>till för?</em></h2>
+  <p class="lead reveal">Verktyget riktar sig brett men passar särskilt bra för personer som funderar på att byta stil men är osäkra på vad som passar dem.</p>
+
+  <div class="audience-grid reveal">
+    <div class="audience-card">
+      <div class="audience-emoji">💼</div>
+      <h4>Vardagskonsumenten</h4>
+      <p>Privatpersoner som är nyfikna på en ny frisyr inför en viktig händelse eller som helt enkelt vill förnya sig. Inga tekniska krav — om du kan ladda upp ett foto kan du använda verktyget.</p>
+    </div>
+    <div class="audience-card">
+      <div class="audience-emoji">💍</div>
+      <h4>Bröllopspar & festplanerare</h4>
+      <p>Bröllopsplanering innebär många estetiska beslut. Tillfällesfiltret gör det lätt att hitta passande frisyrer specifikt för bröllop, fest eller högtidliga tillfällen.</p>
+    </div>
+    <div class="audience-card">
+      <div class="audience-emoji">✂️</div>
+      <h4>Frisörer & stylister</h4>
+      <p>Professionella frisörer kan använda verktyget som ett konsultationshjälpmedel — visa kunden hur en tänkt frisyr faktiskt ser ut på just dem, innan saxen tas fram.</p>
+    </div>
+    <div class="audience-card">
+      <div class="audience-emoji">📱</div>
+      <h4>Ungdomar & trendintresserade</h4>
+      <p>Yngre användare som följer hårtrender på sociala medier och vill experimentera med färger och stilar utan att binda upp sig. Fungerar som ett trygghetsnät före ett djärvt beslut.</p>
+    </div>
+    <div class="audience-card">
+      <div class="audience-emoji">🎭</div>
+      <h4>Content creators</h4>
+      <p>Influencers och bloggare inom beauty och mode kan använda verktyget för att skapa "before & after"-innehåll, diskutera trender eller göra engagerande visuellt material.</p>
+    </div>
+    <div class="audience-card">
+      <div class="audience-emoji">🌍</div>
+      <h4>Bred global tillgänglighet</h4>
+      <p>Gratis, webbaserat och utan krav på registrering — verktyget är tillgängligt för vem som helst med en enhet och internetuppkoppling, oavsett plats i världen.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- 04 FUNKTIONER -->
+<section id="funktioner">
+  <div class="section-label reveal">04 — Funktioner</div>
+  <h2 class="reveal">Vad <em>erbjuder</em><br>verktyget?</h2>
+
+  <div class="features-layout reveal">
+    <div class="feature-list">
+      <div class="feature-item"><div class="feat-dot"></div><div><strong>100+ frisyrstilar</strong><span>Från korta pixie cuts till långa romantiska vågor — ett brett urval som täcker alla stilar och tillfällen.</span></div></div>
+      <div class="feature-item"><div class="feat-dot"></div><div><strong>Bred hårfärgspanel</strong><span>Välj bland naturliga nyanser som brun och blond, eller djärva alternativ som pastell, rött, lila och ombré-effekter.</span></div></div>
+      <div class="feature-item"><div class="feat-dot"></div><div><strong>Kön- och tillfällesfilter</strong><span>Filtrera på kön och tillfälle (arbete, dejt, bröllop, fest, vardag) för att snabbt hitta relevanta alternativ.</span></div></div>
+      <div class="feature-item"><div class="feat-dot"></div><div><strong>Hyperrealistiska resultat</strong><span>AI-tekniken strävar efter bilder som ser ut som riktiga fotografier — inte illustrationer eller tecknat.</span></div></div>
+      <div class="feature-item"><div class="feat-dot"></div><div><strong>Omedelbar generering</strong><span>Inga långa väntetider. Resultaten visas snabbt, vilket gör det lätt att testa flera kombinationer.</span></div></div>
+      <div class="feature-item"><div class="feat-dot"></div><div><strong>Ladda ner & dela</strong><span>Spara ditt favoritresultat till enheten eller dela det direkt med frisören som stilreferens.</span></div></div>
+    </div>
+
+    <div>
+      <div style="background:var(--card);border:1px solid var(--border);padding:28px;border-radius:2px;margin-bottom:14px;">
+        <div style="font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;">Urval av tillgängliga stilar</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          <span style="background:var(--bg);border:1px solid var(--border);padding:5px 11px;font-size:0.74rem;color:var(--muted);border-radius:2px;">Pixie Cut</span>
+          <span style="background:var(--bg);border:1px solid var(--border);padding:5px 11px;font-size:0.74rem;color:var(--muted);border-radius:2px;">Beach Waves</span>
+          <span style="background:var(--bg);border:1px solid var(--border);padding:5px 11px;font-size:0.74rem;color:var(--muted);border-radius:2px;">Bob</span>
+          <span style="background:var(--bg);border:1px solid var(--gold);padding:5px 11px;font-size:0.74rem;color:var(--gold);border-radius:2px;">Braids</span>
+          <span style="background:var(--bg);border:1px solid var(--border);padding:5px 11px;font-size:0.74rem;color:var(--muted);border-radius:2px;">Curtain Bangs</span>
+          <span style="background:var(--bg);border:1px solid var(--border);padding:5px 11px;font-size:0.74rem;color:var(--muted);border-radius:2px;">Loose Bun</span>
+          <span style="background:var(--bg);border:1px solid var(--border);padding:5px 11px;font-size:0.74rem;color:var(--muted);border-radius:2px;">Lob</span>
+          <span style="background:var(--bg);border:1px solid var(--border);padding:5px 11px;font-size:0.74rem;color:var(--muted);border-radius:2px;">Undercut</span>
+          <span style="background:var(--bg);border:1px solid var(--border);padding:5px 11px;font-size:0.74rem;color:var(--muted);border-radius:2px;">Afro</span>
+          <span style="background:var(--bg);border:1px solid var(--border);padding:5px 11px;font-size:0.74rem;color:var(--muted);border-radius:2px;">French Twist</span>
+          <span style="background:var(--bg);border:1px solid var(--border);padding:5px 11px;font-size:0.74rem;color:var(--muted);border-radius:2px;">Side-swept</span>
+          <span style="background:var(--bg);border:1px solid rgba(201,169,110,0.3);padding:5px 11px;font-size:0.74rem;color:var(--gold);border-radius:2px;">+ 90 fler</span>
+        </div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);padding:28px;border-radius:2px;">
+        <div style="font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;">Hårfärgspanel</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <div style="text-align:center;"><div style="width:36px;height:36px;border-radius:50%;background:#1A0A00;border:2px solid var(--border);margin:0 auto 6px;"></div><span style="font-size:0.66rem;color:var(--muted);">Svart</span></div>
+          <div style="text-align:center;"><div style="width:36px;height:36px;border-radius:50%;background:#6B3A2A;border:2px solid var(--border);margin:0 auto 6px;"></div><span style="font-size:0.66rem;color:var(--muted);">Brun</span></div>
+          <div style="text-align:center;"><div style="width:36px;height:36px;border-radius:50%;background:#C9A96E;border:2px solid var(--border);margin:0 auto 6px;"></div><span style="font-size:0.66rem;color:var(--muted);">Blond</span></div>
+          <div style="text-align:center;"><div style="width:36px;height:36px;border-radius:50%;background:#C0392B;border:2px solid var(--border);margin:0 auto 6px;"></div><span style="font-size:0.66rem;color:var(--muted);">Röd</span></div>
+          <div style="text-align:center;"><div style="width:36px;height:36px;border-radius:50%;background:#9B59B6;border:2px solid var(--border);margin:0 auto 6px;"></div><span style="font-size:0.66rem;color:var(--muted);">Lila</span></div>
+          <div style="text-align:center;"><div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#E8C98A,#C0392B);border:2px solid var(--border);margin:0 auto 6px;"></div><span style="font-size:0.66rem;color:var(--muted);">Ombré</span></div>
+          <div style="text-align:center;"><div style="width:36px;height:36px;border-radius:50%;background:#ECEFF1;border:2px solid var(--border);margin:0 auto 6px;"></div><span style="font-size:0.66rem;color:var(--muted);">Silver</span></div>
+          <div style="text-align:center;"><div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#00CDAC,#8DDAD5);border:2px solid var(--border);margin:0 auto 6px;"></div><span style="font-size:0.66rem;color:var(--muted);">Pastell</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- 05 BEGRÄNSNINGAR -->
+<section id="begransningar">
+  <div class="section-label reveal">05 — Begränsningar</div>
+  <h2 class="reveal">Vad bör man<br><em>känna till?</em></h2>
+  <p class="lead reveal">Alla verktyg har sina gränser. Här är en transparent genomgång av kända begränsningar — inklusive kostnad, versioner och tekniska krav.</p>
+
+  <table class="limits-table reveal">
+    <thead>
+      <tr>
+        <th>Begränsning</th>
+        <th>Detaljer</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Gratis vs premium</strong></td>
+        <td>Grundfunktioner är gratis. Fler genereringar per dag, högre upplösning och prioritetsbearbetning kräver betalabonnemang. Exakt pris varierar — kontrollera direkt på sajten för aktuella priser.</td>
+        <td><span class="badge badge-warn">Freemium</span></td>
+      </tr>
+      <tr>
+        <td><strong>Genereringsgräns (gratis)</strong></td>
+        <td>Gratisanvändare har ett begränsat antal genereringar per dag eller månad. Exakt antal kan ändras utan förvarning. Liknar ett "token"-system där varje generering kostar en kredit.</td>
+        <td><span class="badge badge-warn">Begränsat</span></td>
+      </tr>
+      <tr>
+        <td><strong>Fotokvalitetskrav</strong></td>
+        <td>Resultaten påverkas kraftigt av inputfotots kvalitet. Dålig belysning, suddig bild eller extrem vinkel ger märkbart sämre AI-resultat.</td>
+        <td><span class="badge badge-warn">Krav</span></td>
+      </tr>
+      <tr>
+        <td><strong>Realism varierar</strong></td>
+        <td>Trots "hyperrealistiska" påståenden kan resultaten ibland se digitalt bearbetade ut — framförallt vid ovanliga ansiktsformer eller mycket komplexa frisyrer.</td>
+        <td><span class="badge badge-info">Varierar</span></td>
+      </tr>
+      <tr>
+        <td><strong>Ingen 3D- eller videovisning</strong></td>
+        <td>Resultaten är statiska 2D-bilder framifrån. Det finns ingen möjlighet att se frisyren från sidan, bakifrån eller i rörelse.</td>
+        <td><span class="badge badge-warn">Saknas</span></td>
+      </tr>
+      <tr>
+        <td><strong>Dataskydd & lagring</strong></td>
+        <td>Foton raderas efter 24 timmar, men behandlas under den perioden på externa servrar. Känsliga individer bör vara medvetna om detta innan de laddar upp bilder på sig själva.</td>
+        <td><span class="badge badge-ok">24h-radering</span></td>
+      </tr>
+      <tr>
+        <td><strong>Kräver stabil internet</strong></td>
+        <td>All bearbetning sker i molnet. Inget offlineläge finns tillgängligt.</td>
+        <td><span class="badge badge-warn">Online only</span></td>
+      </tr>
+      <tr>
+        <td><strong>Enbart engelska</strong></td>
+        <td>Gränssnittet är primärt på engelska. Begränsat stöd för andra språk kan påverka upplevelsen för icke-engelsktalande användare.</td>
+        <td><span class="badge badge-info">Engelska</span></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<hr class="divider" />
+
+<!-- 06 PROCESS -->
+<section id="process">
+  <div class="section-label reveal">06 — Processens dokumentation</div>
+  <h2 class="reveal">Hur gick arbetet<br><em>till?</em></h2>
+  <p class="lead reveal">Här dokumenteras de steg som togs för att testa, analysera och presentera AI Hair Changer — inklusive observationer från faktisk användning av verktyget.</p>
+
+  <div class="process-timeline">
+
+    <div class="process-step reveal">
+      <div class="process-num">1</div>
+      <div class="process-content">
+        <h4>Hitta och välja verktyget</h4>
+        <p>Sökte efter AI-verktyg inom mode och utseende på Google och YouTube. AI Hair Changer valdes ut eftersom det kombinerar tydlig nytta (frisyrprovning), intressant AI-teknik (bildgenerering) och en bred målgrupp som gör det lätt att analysera och presentera.</p>
+        <div class="mockup">
+          <div class="mockup-bar">
+            <div class="mockup-dot" style="background:#E8634A;"></div>
+            <div class="mockup-dot" style="background:#D4A017;"></div>
+            <div class="mockup-dot" style="background:#6BAF7A;"></div>
+            <div class="mockup-url">google.com — "best free AI hairstyle changer 2024"</div>
+          </div>
+          <div class="mockup-body">
+            <div style="font-size:1.8rem;">🔍</div>
+            <p style="font-size:0.82rem;color:var(--muted);max-width:380px;line-height:1.6;">Googlade efter AI-drivna frisyrverktyg. AI Hair Changer dök upp bland toppresultaten med gratis-tier och positiva omdömen. Verktyget testades direkt utan att registrera konto.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="process-step reveal">
+      <div class="process-num">2</div>
+      <div class="process-content">
+        <h4>Utforska gränssnittet</h4>
+        <p>Besökte aihairchanger.io och dokumenterade gränssnittet. Noterade att uppladdningsfunktionen är central, att köns- och tillfällesfilter finns direkt synliga vid start, och att ingen inloggning krävdes för att komma igång.</p>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:3px;padding:20px;margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <span style="font-size:0.72rem;color:var(--muted);">Observationer:</span>
+          <span style="background:var(--bg);border:1px solid var(--green);color:var(--green);padding:5px 12px;border-radius:2px;font-size:0.74rem;">✓ Ingen inloggning</span>
+          <span style="background:var(--bg);border:1px solid var(--green);color:var(--green);padding:5px 12px;border-radius:2px;font-size:0.74rem;">✓ Tydlig layout</span>
+          <span style="background:var(--bg);border:1px solid var(--green);color:var(--green);padding:5px 12px;border-radius:2px;font-size:0.74rem;">✓ Filter synliga</span>
+          <span style="background:var(--bg);border:1px solid var(--accent);color:var(--accent);padding:5px 12px;border-radius:2px;font-size:0.74rem;">⚠ Engelska only</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="process-step reveal">
+      <div class="process-num">3</div>
+      <div class="process-content">
+        <h4>Testa verktyget i praktiken</h4>
+        <p>Testade tre kombinationer för att bedöma kvalitet och realism: kort pixie cut i mörkbrunt (arbete), långa beach waves i blond (bröllop) och djärv lila bob (fest). Noterade genereringstid, realism och var resultaten imponerade respektive brast.</p>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;">
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:3px;padding:16px;text-align:center;">
+            <div style="font-size:1.5rem;margin-bottom:8px;">✂️</div>
+            <div style="font-size:0.7rem;color:var(--gold);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.06em;">Test 1</div>
+            <div style="font-size:0.78rem;color:var(--muted);line-height:1.6;">Pixie cut<br>Mörkbrun / Arbete</div>
+            <div style="margin-top:10px;font-size:0.7rem;background:rgba(107,175,122,0.12);color:var(--green);padding:4px 8px;border-radius:2px;">✓ Mycket realistisk</div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:3px;padding:16px;text-align:center;">
+            <div style="font-size:1.5rem;margin-bottom:8px;">🌊</div>
+            <div style="font-size:0.7rem;color:var(--gold);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.06em;">Test 2</div>
+            <div style="font-size:0.78rem;color:var(--muted);line-height:1.6;">Beach waves<br>Blond / Bröllop</div>
+            <div style="margin-top:10px;font-size:0.7rem;background:rgba(107,175,122,0.12);color:var(--green);padding:4px 8px;border-radius:2px;">✓ Imponerande</div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:3px;padding:16px;text-align:center;">
+            <div style="font-size:1.5rem;margin-bottom:8px;">💜</div>
+            <div style="font-size:0.7rem;color:var(--gold);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.06em;">Test 3</div>
+            <div style="font-size:0.78rem;color:var(--muted);line-height:1.6;">Lila bob<br>Lila / Fest</div>
+            <div style="margin-top:10px;font-size:0.7rem;background:rgba(212,113,74,0.12);color:var(--accent);padding:4px 8px;border-radius:2px;">⚠ Lite artificiell</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="process-step reveal">
+      <div class="process-num">4</div>
+      <div class="process-content">
+        <h4>Undersöka prissättning och versioner</h4>
+        <p>Besökte prissidan för att kartlägga skillnaderna mellan gratis- och premiumversionen. Noterade var betalväggen uppstod under testningen och hur det påverkade användarupplevelsen.</p>
+        <div style="display:flex;gap:12px;margin-top:12px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:140px;background:var(--card);border:1px solid var(--border);border-radius:3px;padding:20px;">
+            <div style="font-size:0.7rem;color:var(--muted);letter-spacing:0.08em;margin-bottom:10px;text-transform:uppercase;">Gratis</div>
+            <div style="font-size:1.4rem;font-weight:600;color:var(--text);margin-bottom:12px;">$0</div>
+            <div style="font-size:0.76rem;color:var(--muted);line-height:1.9;">✓ Begränsade genereringar<br>✓ Standardupplösning<br>✗ Ingen köprioritet<br>✗ Vattenmärke möjligt</div>
+          </div>
+          <div style="flex:1;min-width:140px;background:var(--card);border:1px solid var(--gold);border-radius:3px;padding:20px;">
+            <div style="font-size:0.7rem;color:var(--gold);letter-spacing:0.08em;margin-bottom:10px;text-transform:uppercase;">Premium</div>
+            <div style="font-size:1.4rem;font-weight:600;color:var(--gold);margin-bottom:12px;">Varierar</div>
+            <div style="font-size:0.76rem;color:var(--muted);line-height:1.9;">✓ Fler/obegränsade bilder<br>✓ HD-resultat<br>✓ Snabbare generering<br>✓ Ingen vattenstämpel</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="process-step reveal">
+      <div class="process-num">5</div>
+      <div class="process-content">
+        <h4>Sammanställa och bygga webbsidan</h4>
+        <p>All insamlad information sammanställdes till denna webbsida. AI (Claude av Anthropic) användes för att hjälpa till med struktur, textformulering och HTML/CSS-kod. Sidan är designad att fungera direkt som en GitHub Pages-sida med en enda <code style="color:var(--gold);font-size:0.85em;">index.html</code>-fil.</p>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:3px;padding:22px;margin-top:12px;">
+          <div style="font-size:0.7rem;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:14px;">AI-verktyg använda i detta projekt</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <div style="background:var(--bg);border:1px solid var(--border);padding:12px 18px;border-radius:2px;font-size:0.82rem;">
+              <strong style="color:var(--text);">Claude (Anthropic)</strong><br>
+              <span style="color:var(--muted);font-size:0.74rem;">Textgenerering, struktur & kod</span>
+            </div>
+            <div style="background:var(--bg);border:1px solid rgba(201,169,110,0.3);padding:12px 18px;border-radius:2px;font-size:0.82rem;">
+              <strong style="color:var(--gold);">AI Hair Changer</strong><br>
+              <span style="color:var(--muted);font-size:0.74rem;">Det analyserade verktyget</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- 07 UTVÄRDERING -->
+<section id="utvardering">
+  <div class="section-label reveal">07 — Utvärdering</div>
+  <h2 class="reveal">Vad är mitt<br><em>omdöme?</em></h2>
+  <p class="lead reveal">En balanserad bedömning baserad på faktisk testning — vad fungerar bra, vad kan förbättras och vilket slutbetyg förtjänar verktyget?</p>
+
+  <div class="eval-grid reveal">
+    <div class="eval-card positive">
+      <h4>✓ Styrkor</h4>
+      <ul class="eval-list">
+        <li>Extremt lättanvänt — inga tekniska kunskaper krävs överhuvudtaget</li>
+        <li>Imponerande bredd med 100+ stilar och ett rikt färgurval</li>
+        <li>Gratis basversion gör verktyget tillgängligt för alla</li>
+        <li>Integritetsvänligt med automatisk 24-timmars bildradering</li>
+        <li>Tillfälles- och könsfiltret hjälper att hitta rätt stil snabbt</li>
+        <li>Resultaten är i många fall häpnadsväckande realistiska</li>
+      </ul>
+    </div>
+    <div class="eval-card negative">
+      <h4>⚠ Svagheter</h4>
+      <ul class="eval-list">
+        <li>Resultatkvaliteten varierar kraftigt beroende på fotots kvalitet</li>
+        <li>Gratisgränsen begränsar antalet möjliga genereringar märkbart</li>
+        <li>Inga 3D- eller videovyer — bara statiska framifrånbilder</li>
+        <li>Gränssnittet är enbart på engelska</li>
+        <li>Kan se digitalt bearbetad ut vid ovanliga ansiktsformer</li>
+        <li>Oklart exakt hur länge foton lagras och vem som har åtkomst</li>
+      </ul>
+    </div>
+  </div>
+
+  <div style="margin-top:56px;" class="reveal">
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:300;margin-bottom:8px;">Betygsättning</h3>
+    <p style="font-size:0.84rem;color:var(--muted);margin-bottom:32px;">Skala 1–10, baserat på personlig testning</p>
+    <div class="rating-bar">
+      <div class="rating-row">
+        <span class="rating-label">Användarvänlighet</span>
+        <div class="rating-track"><div class="rating-fill" style="width:95%;"></div></div>
+        <span class="rating-score">9.5</span>
+      </div>
+      <div class="rating-row">
+        <span class="rating-label">Realism i resultat</span>
+        <div class="rating-track"><div class="rating-fill" style="width:75%;"></div></div>
+        <span class="rating-score">7.5</span>
+      </div>
+      <div class="rating-row">
+        <span class="rating-label">Stilurval</span>
+        <div class="rating-track"><div class="rating-fill" style="width:90%;"></div></div>
+        <span class="rating-score">9.0</span>
+      </div>
+      <div class="rating-row">
+        <span class="rating-label">Integritetsskydd</span>
+        <div class="rating-track"><div class="rating-fill" style="width:70%;"></div></div>
+        <span class="rating-score">7.0</span>
+      </div>
+      <div class="rating-row">
+        <span class="rating-label">Värde för pengarna</span>
+        <div class="rating-track"><div class="rating-fill" style="width:80%;"></div></div>
+        <span class="rating-score">8.0</span>
+      </div>
+      <div class="rating-row" style="border-top:1px solid var(--border);padding-top:16px;margin-top:4px;">
+        <span class="rating-label" style="font-weight:600;color:var(--text);">Totalt omdöme</span>
+        <div class="rating-track"><div class="rating-fill" style="width:82%;background:linear-gradient(to right,var(--accent),var(--gold-light));"></div></div>
+        <span class="rating-score" style="font-size:1rem;">8.2</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:var(--card);border:1px solid var(--border);border-left:3px solid var(--gold);padding:40px;margin-top:48px;border-radius:0 2px 2px 0;" class="reveal">
+    <div style="font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;">Slutsats</div>
+    <p style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:300;line-height:1.5;color:var(--text);margin-bottom:16px;">
+      AI Hair Changer är ett <em style="color:var(--gold-light);">genuint användbart och imponerande</em> verktyg för den som vill prova nya frisyrer riskfritt.
     </p>
-</section>
-
-<section id="gallery">
-    <h2>Bilder</h2>
-    <div class="grid">
-        <img src="images/bild1.jpg" alt="">
-        <img src="images/bild2.jpg" alt="">
-        <img src="images/bild3.jpg" alt="">
-    </div>
-</section>
-
-<section id="contact">
-    <h2>Kontakt</h2>
-    <div class="contact-box">
-        <p>Email: info@ekenved.se</p>
-        <p>Telefon: 070-123 45 67</p>
-    </div>
+    <p style="font-size:0.9rem;line-height:1.8;color:var(--muted);">
+      Det löser ett verkligt problem på ett enkelt sätt och gör avancerad AI-teknik tillgänglig utan någon teknisk kunskap. Gratisversionen räcker för att bilda sig en bra uppfattning, men för regelbunden användning krävs ett premiumabonnemang. Verktyget rekommenderas varmt till privatpersoner, frisörer och alla som funderar på att byta stil men vill se resultatet innan de bestämmer sig.
+    </p>
+  </div>
 </section>
 
 <footer>
-    <p>© 2026 Ekenved</p>
+  <div>
+    <div class="footer-logo">AI Hair Changer</div>
+    <p style="margin-top:12px;">Skoluppgift: Presentation och utvärdering av ett AI-verktyg.<br>Webbsida skapad med HTML & CSS. Claude (Anthropic) användes för textgenerering och kodproduktion.</p>
+  </div>
+  <div class="footer-right">
+    <p>Analyserat verktyg: <strong style="color:var(--text);">aihairchanger.io</strong></p>
+    <p>Kursuppgift — Teknik & AI</p>
+    <p style="margin-top:8px;color:rgba(138,127,112,0.4);font-size:0.7rem;">© 2025 — Skapad för utbildningsändamål</p>
+  </div>
 </footer>
 
+<script>
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.07 });
+  reveals.forEach(r => io.observe(r));
+</script>
 </body>
 </html>
