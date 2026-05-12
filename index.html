@@ -4,27 +4,21 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>AI Hair Changer — Verktygsanalys</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#0D0B09;--surface:#161310;--card:#1E1A16;
-  --border:rgba(210,175,120,0.15);--gold:#C9A96E;--gl:#E8C98A;
-  --text:#F0EAE0;--muted:#8A7F70;--accent:#D4714A;--green:#6BAF7A;
-}
+:root{--bg:#0D0B09;--surface:#161310;--card:#1E1A16;--border:rgba(210,175,120,0.15);--gold:#C9A96E;--gl:#E8C98A;--text:#F0EAE0;--muted:#8A7F70;--accent:#D4714A;--green:#6BAF7A}
 html{scroll-behavior:smooth}
 body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
 
-/* NAV */
 nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;align-items:center;justify-content:space-between;padding:16px 48px;background:rgba(13,11,9,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
 .nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:600;color:var(--gold)}
 .nav-links{display:flex;gap:26px;list-style:none}
-.nav-links a{text-decoration:none;color:var(--muted);font-size:0.75rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;transition:color .2s;cursor:pointer}
+.nav-links a{text-decoration:none;color:var(--muted);font-size:.75rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;transition:color .2s;cursor:pointer}
 .nav-links a:hover{color:var(--gl)}
 .nav-hbg{display:none;background:none;border:none;color:var(--gold);font-size:1.4rem;cursor:pointer}
 
-/* HERO */
 .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:140px 48px 80px;position:relative;overflow:hidden}
 .hero-glow{position:absolute;width:700px;height:700px;background:radial-gradient(circle,rgba(201,169,110,.07) 0%,transparent 65%);border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
 .hero-tag{display:inline-flex;align-items:center;gap:10px;font-size:.72rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);background:rgba(201,169,110,.08);border:1px solid rgba(201,169,110,.2);padding:8px 20px;border-radius:40px;margin-bottom:32px;animation:fd .8s ease both}
@@ -40,7 +34,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;align-items:cen
 @keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(7px)}}
 .scroll-line{width:1px;height:38px;background:linear-gradient(to bottom,var(--gold),transparent)}
 
-/* SECTIONS */
 section{padding:88px 56px;max-width:1100px;margin:0 auto}
 .divider{border:none;border-top:1px solid var(--border);margin:0 56px}
 .section-label{display:flex;align-items:center;gap:14px;font-size:.68rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:20px}
@@ -49,14 +42,12 @@ h2{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4vw,3.2rem);font-
 h2 em{font-style:italic;color:var(--gl)}
 .lead{font-size:.97rem;line-height:1.8;color:var(--muted);max-width:660px;margin-bottom:40px}
 
-/* ABOUT */
 .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--border);border:1px solid var(--border)}
 .about-cell{background:var(--card);padding:34px}
 .about-cell .icon{font-size:1.7rem;margin-bottom:12px}
 .about-cell h3{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;color:var(--gl);margin-bottom:10px}
 .about-cell p{font-size:.87rem;line-height:1.75;color:var(--muted)}
 
-/* STEPS */
 .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--border);border:1px solid var(--border);margin-top:40px}
 .step{background:var(--card);padding:30px 20px;position:relative;transition:background .25s}
 .step:hover{background:var(--surface)}
@@ -65,52 +56,77 @@ h2 em{font-style:italic;color:var(--gl)}
 .step p{font-size:.79rem;line-height:1.65;color:var(--muted)}
 .step-icon{position:absolute;top:20px;right:20px;font-size:1.2rem}
 
-/* DEMO BOX */
-.demo-box{background:var(--card);border:1px solid var(--border);border-radius:4px;overflow:hidden;margin-top:40px}
-.demo-bar{background:var(--surface);padding:10px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
-.demo-dot{width:10px;height:10px;border-radius:50%}
-.demo-url{flex:1;background:var(--card);border-radius:4px;padding:4px 12px;font-size:.72rem;color:var(--muted);text-align:center}
+/* ── HAIR CHANGER TOOL ── */
+.tool-box{background:var(--card);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-top:40px}
+.tool-bar{background:var(--surface);padding:10px 18px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
+.tbar-dot{width:10px;height:10px;border-radius:50%}
+.tbar-url{flex:1;background:var(--card);border-radius:4px;padding:4px 14px;font-size:.72rem;color:var(--muted);text-align:center}
 
-/* UPLOAD AREA */
-.upload-area{border:2px dashed rgba(201,169,110,.3);border-radius:6px;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;transition:border-color .25s,background .25s;position:relative;overflow:hidden;padding:24px}
-.upload-area:hover,.upload-area.drag-over{border-color:var(--gold);background:rgba(201,169,110,.04)}
-.upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.upload-icon{font-size:2.4rem;pointer-events:none}
-.upload-text{font-size:.9rem;color:var(--muted);pointer-events:none}
-.upload-hint{font-size:.73rem;color:rgba(138,127,112,.6);pointer-events:none}
-.upload-btn-fake{background:var(--gold);color:var(--bg);border:none;padding:9px 26px;font-size:.8rem;font-weight:600;border-radius:2px;pointer-events:none;letter-spacing:.04em;font-family:'Outfit',sans-serif}
-.upload-area:hover .upload-btn-fake{background:var(--gl)}
+.tool-inner{display:grid;grid-template-columns:1fr 1.6fr;min-height:520px}
+.tool-left{border-right:1px solid var(--border);display:flex;flex-direction:column}
+.tool-right{display:flex;flex-direction:column}
 
-/* FILTERS */
-.filter-group{display:flex;flex-direction:column;gap:6px}
-.filter-label{font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.filter-btns{display:flex;gap:6px;flex-wrap:wrap}
-.fbtn{background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:6px 13px;font-size:.75rem;font-family:'Outfit',sans-serif;border-radius:2px;cursor:pointer;transition:all .2s}
-.fbtn:hover{border-color:var(--gold);color:var(--gold)}
-.fbtn.active{border-color:var(--gold);background:rgba(201,169,110,.1);color:var(--gold);font-weight:600}
+/* Upload */
+.upload-zone{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:28px;border:2px dashed rgba(201,169,110,.25);border-radius:4px;margin:16px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;text-align:center}
+.upload-zone:hover,.upload-zone.over{border-color:var(--gold);background:rgba(201,169,110,.04)}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-zone .uz-icon{font-size:2.4rem;pointer-events:none}
+.upload-zone .uz-text{font-size:.88rem;color:var(--muted);pointer-events:none}
+.upload-zone .uz-hint{font-size:.72rem;color:rgba(138,127,112,.6);pointer-events:none}
+.upload-zone .uz-btn{background:var(--gold);color:var(--bg);border:none;padding:9px 24px;font-size:.8rem;font-weight:600;font-family:'Outfit',sans-serif;border-radius:2px;pointer-events:none;letter-spacing:.04em}
+.upload-zone:hover .uz-btn{background:var(--gl)}
 
-/* GALLERY */
-.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px}
-.gallery-card{background:var(--surface);border:2px solid var(--border);border-radius:3px;overflow:hidden;cursor:pointer;transition:border-color .2s,transform .2s;position:relative}
-.gallery-card:hover{border-color:var(--gold);transform:translateY(-3px)}
-.gallery-card.selected{border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,169,110,.3)}
-.gallery-card canvas{width:100%;display:block;aspect-ratio:3/4;object-fit:cover}
-.gallery-card-label{padding:8px 10px;font-size:.72rem;font-weight:500;line-height:1.3}
-.gallery-card-sub{font-size:.66rem;color:var(--muted)}
-.gallery-card .selected-badge{display:none;position:absolute;top:6px;right:6px;background:var(--gold);color:var(--bg);font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:1px}
-.gallery-card.selected .selected-badge{display:block}
+/* Photo preview left */
+.photo-preview{flex:1;margin:16px;position:relative;display:none;background:var(--surface);border-radius:4px;overflow:hidden;min-height:200px}
+.photo-preview img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-preview canvas.hair-overlay{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+.change-btn{margin:0 16px 16px;background:none;border:1px solid var(--border);color:var(--muted);padding:8px;font-size:.74rem;font-family:'Outfit',sans-serif;border-radius:2px;cursor:pointer;transition:all .2s;text-align:center}
+.change-btn:hover{border-color:var(--accent);color:var(--accent)}
 
-/* RESULT PANEL */
-.result-panel{background:var(--surface);border:1px solid var(--gold);border-radius:3px;overflow:hidden;margin-top:20px}
-.result-panel-bar{background:var(--card);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px}
-.result-split{display:flex;flex-wrap:wrap}
-.result-split-side{flex:1;min-width:200px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:8px}
-.result-split-divider{width:1px;background:var(--border)}
-.result-img{max-height:300px;max-width:100%;border-radius:3px;object-fit:contain}
-.panel-label{font-size:.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
-.panel-label.gld{color:var(--gold)}
-.abtn{background:var(--card);border:1px solid var(--border);color:var(--muted);padding:7px 16px;font-size:.74rem;font-family:'Outfit',sans-serif;border-radius:2px;cursor:pointer;transition:all .2s}
-.abtn:hover{border-color:var(--gold);color:var(--gold)}
+/* Controls */
+.tool-controls{padding:16px;border-bottom:1px solid var(--border)}
+.ctrl-label{font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.ctrl-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.pill{background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:5px 12px;font-size:.74rem;font-family:'Outfit',sans-serif;border-radius:20px;cursor:pointer;transition:all .2s}
+.pill:hover{border-color:var(--gold);color:var(--gold)}
+.pill.active{border-color:var(--gold);background:rgba(201,169,110,.1);color:var(--gold);font-weight:600}
+.color-pills{display:flex;gap:8px;flex-wrap:wrap}
+.cpill{width:28px;height:28px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:all .2s;position:relative}
+.cpill:hover,.cpill.active{border-color:var(--gold);transform:scale(1.15)}
+.cpill .cpill-label{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:.6rem;color:var(--muted);white-space:nowrap}
+
+/* Gallery */
+.hair-gallery{flex:1;overflow-y:auto;padding:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;align-content:start}
+.hair-gallery::-webkit-scrollbar{width:4px}
+.hair-gallery::-webkit-scrollbar-track{background:var(--surface)}
+.hair-gallery::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.hcard{background:var(--surface);border:2px solid var(--border);border-radius:4px;overflow:hidden;cursor:pointer;transition:all .2s;position:relative}
+.hcard:hover{border-color:var(--gold);transform:translateY(-2px)}
+.hcard.selected{border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,169,110,.25)}
+.hcard-preview{height:90px;display:flex;align-items:center;justify-content:center;font-size:2.2rem;position:relative;overflow:hidden;background:var(--card)}
+.hcard-preview svg{width:100%;height:100%;position:absolute;top:0;left:0}
+.hcard-name{font-size:.7rem;font-weight:600;padding:6px 8px 2px;line-height:1.2}
+.hcard-sub{font-size:.62rem;color:var(--muted);padding:0 8px 7px}
+.hcard .sel-badge{display:none;position:absolute;top:5px;right:5px;background:var(--gold);color:var(--bg);font-size:.58rem;font-weight:700;padding:2px 6px;border-radius:1px}
+.hcard.selected .sel-badge{display:block}
+
+/* Result area */
+.result-area{padding:16px;border-top:1px solid var(--border);display:none}
+.result-area.visible{display:flex;gap:12px;align-items:center}
+.result-info{flex:1}
+.result-info .ri-name{font-size:.88rem;font-weight:600}
+.result-info .ri-sub{font-size:.74rem;color:var(--muted);margin-top:2px}
+.result-btns{display:flex;gap:8px}
+.rbtn{background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:8px 16px;font-size:.75rem;font-family:'Outfit',sans-serif;border-radius:2px;cursor:pointer;transition:all .2s}
+.rbtn:hover{border-color:var(--gold);color:var(--gold)}
+.rbtn.primary{background:var(--gold);border-color:var(--gold);color:var(--bg);font-weight:600}
+.rbtn.primary:hover{background:var(--gl)}
+
+/* Status bar */
+.status-bar{padding:10px 16px;border-top:1px solid var(--border);font-size:.72rem;color:var(--muted);display:flex;align-items:center;gap:8px}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+.status-dot.loading{background:var(--gold);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
 /* AUDIENCE */
 .aud-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:40px}
@@ -120,7 +136,6 @@ h2 em{font-style:italic;color:var(--gl)}
 .aud-card h4{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;color:var(--gl);margin-bottom:8px}
 .aud-card p{font-size:.82rem;line-height:1.7;color:var(--muted)}
 
-/* FEATURES */
 .feat-layout{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;margin-top:40px}
 .feat-list{display:flex;flex-direction:column}
 .feat-item{display:flex;gap:16px;padding:18px 0;border-bottom:1px solid var(--border);align-items:flex-start}
@@ -128,7 +143,7 @@ h2 em{font-style:italic;color:var(--gl)}
 .feat-dot{width:7px;height:7px;background:var(--gold);border-radius:50%;margin-top:6px;flex-shrink:0}
 .feat-item strong{display:block;font-size:.85rem;font-weight:600;margin-bottom:3px}
 .feat-item span{font-size:.8rem;line-height:1.65;color:var(--muted)}
-.style-tags{display:flex;flex-wrap:wrap;gap:7px}
+.stags{display:flex;flex-wrap:wrap;gap:7px}
 .stag{background:var(--bg);border:1px solid var(--border);padding:5px 11px;font-size:.72rem;color:var(--muted);border-radius:2px}
 .stag.hi{border-color:rgba(201,169,110,.4);color:var(--gold)}
 .swatches{display:flex;gap:10px;flex-wrap:wrap}
@@ -136,7 +151,6 @@ h2 em{font-style:italic;color:var(--gl)}
 .sw-c{width:34px;height:34px;border-radius:50%;border:2px solid var(--border);margin:0 auto 5px}
 .sw span{font-size:.63rem;color:var(--muted)}
 
-/* LIMITS TABLE */
 .ltable{width:100%;border-collapse:collapse;margin-top:40px}
 .ltable th{text-align:left;font-size:.69rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);padding:12px 18px;border-bottom:1px solid var(--border);background:var(--surface)}
 .ltable td{padding:14px 18px;font-size:.83rem;line-height:1.6;color:var(--muted);border-bottom:1px solid rgba(210,175,120,.06);vertical-align:top}
@@ -146,7 +160,6 @@ h2 em{font-style:italic;color:var(--gl)}
 .bo{background:rgba(107,175,122,.12);color:var(--green);border:1px solid rgba(107,175,122,.25)}
 .bi{background:rgba(201,169,110,.1);color:var(--gold);border:1px solid rgba(201,169,110,.2)}
 
-/* PROCESS */
 .proc-timeline{margin-top:48px;display:flex;flex-direction:column}
 .proc-step{display:grid;grid-template-columns:68px 1fr;gap:24px;padding:32px 0;border-bottom:1px solid var(--border)}
 .proc-step:last-child{border-bottom:none}
@@ -159,11 +172,10 @@ h2 em{font-style:italic;color:var(--gl)}
 .tcard .ti{font-size:1.3rem;margin-bottom:5px}
 .tcard .tl{font-size:.67rem;color:var(--gold);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
 .tcard .td{font-size:.75rem;color:var(--muted);line-height:1.5}
-.tcard .tr{margin-top:7px;font-size:.67rem;padding:3px 8px;border-radius:2px}
+.tcard .tr2{margin-top:7px;font-size:.67rem;padding:3px 8px;border-radius:2px}
 .tr-ok{background:rgba(107,175,122,.12);color:var(--green)}
 .tr-warn{background:rgba(212,113,74,.12);color:var(--accent)}
 
-/* EVAL */
 .eval-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:40px}
 .eval-card{background:var(--card);border:1px solid var(--border);padding:26px;border-radius:2px}
 .eval-card.pos{border-top:3px solid var(--green)}
@@ -175,7 +187,6 @@ h2 em{font-style:italic;color:var(--gl)}
 .eval-list li{display:flex;gap:10px;font-size:.83rem;line-height:1.6;color:var(--muted)}
 .eval-list li::before{content:'→';color:var(--gold);flex-shrink:0;font-size:.77rem;margin-top:2px}
 
-/* RATINGS */
 .rating-bar{display:flex;flex-direction:column;gap:13px;margin-top:40px}
 .rating-row{display:grid;grid-template-columns:168px 1fr 40px;align-items:center;gap:13px}
 .rating-label{font-size:.79rem;color:var(--muted)}
@@ -183,31 +194,28 @@ h2 em{font-style:italic;color:var(--gl)}
 .rating-fill{height:100%;background:linear-gradient(to right,var(--gold),var(--gl));border-radius:2px}
 .rating-score{font-size:.79rem;font-weight:600;color:var(--gold);text-align:right}
 
-/* CONCLUSION */
 .concl{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--gold);padding:34px;margin-top:40px;border-radius:0 2px 2px 0}
 .concl .cl{font-size:.67rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
 .concl p:first-of-type{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:300;line-height:1.5;margin-bottom:12px}
 .concl p:last-of-type{font-size:.87rem;line-height:1.8;color:var(--muted)}
 
-/* FOOTER */
 footer{padding:52px 56px 34px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:20px}
 .footer-logo{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;color:var(--gold)}
 footer .fp{font-size:.75rem;color:var(--muted);line-height:1.75;max-width:380px;margin-top:8px}
 .footer-right{text-align:right;font-size:.73rem;color:var(--muted);line-height:1.85}
 
-/* REVEAL */
 .reveal{opacity:0;transform:translateY(22px);transition:opacity .65s ease,transform .65s ease}
 .reveal.visible{opacity:1;transform:translateY(0)}
-
-/* NOTIF */
 .notif{position:fixed;bottom:26px;right:26px;background:var(--card);border:1px solid var(--gold);color:var(--text);padding:12px 20px;border-radius:4px;font-size:.82rem;z-index:999;transform:translateY(70px);opacity:0;transition:all .3s ease;pointer-events:none}
 .notif.show{transform:translateY(0);opacity:1}
-
-/* SPINNER */
 @keyframes spin{to{transform:rotate(360deg)}}
-.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(201,169,110,.3);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(201,169,110,.3);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
 
-/* MOBILE */
+@media(max-width:900px){
+  .tool-inner{grid-template-columns:1fr}
+  .tool-left{border-right:none;border-bottom:1px solid var(--border)}
+  .hair-gallery{grid-template-columns:repeat(4,1fr)}
+}
 @media(max-width:768px){
   nav{padding:14px 20px}
   .nav-links{display:none;flex-direction:column;position:absolute;top:100%;left:0;right:0;background:rgba(13,11,9,.98);padding:18px;gap:14px;border-bottom:1px solid var(--border)}
@@ -223,7 +231,7 @@ footer .fp{font-size:.75rem;color:var(--muted);line-height:1.75;max-width:380px;
   footer{padding:34px 20px;flex-direction:column;align-items:flex-start}
   .footer-right{text-align:left}
   .rating-row{grid-template-columns:120px 1fr 34px}
-  .gallery-grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}
+  .hair-gallery{grid-template-columns:repeat(3,1fr)}
 }
 </style>
 </head>
@@ -231,21 +239,19 @@ footer .fp{font-size:.75rem;color:var(--muted);line-height:1.75;max-width:380px;
 
 <div class="notif" id="notif"></div>
 
-<!-- NAV -->
 <nav>
   <div class="nav-logo">AI Hair Changer</div>
   <ul class="nav-links" id="navLinks">
-    <li><a href="#om" onclick="navClick(event,'om')">Om verktyget</a></li>
-    <li><a href="#anvandning" onclick="navClick(event,'anvandning')">Användning</a></li>
-    <li><a href="#malgrupp" onclick="navClick(event,'malgrupp')">Målgrupp</a></li>
-    <li><a href="#begransningar" onclick="navClick(event,'begransningar')">Begränsningar</a></li>
-    <li><a href="#process" onclick="navClick(event,'process')">Process</a></li>
-    <li><a href="#utvardering" onclick="navClick(event,'utvardering')">Utvärdering</a></li>
+    <li><a onclick="navTo(event,'om')">Om verktyget</a></li>
+    <li><a onclick="navTo(event,'anvandning')">Användning</a></li>
+    <li><a onclick="navTo(event,'malgrupp')">Målgrupp</a></li>
+    <li><a onclick="navTo(event,'begransningar')">Begränsningar</a></li>
+    <li><a onclick="navTo(event,'process')">Process</a></li>
+    <li><a onclick="navTo(event,'utvardering')">Utvärdering</a></li>
   </ul>
-  <button class="nav-hbg" onclick="toggleNav()">☰</button>
+  <button class="nav-hbg" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
 </nav>
 
-<!-- HERO -->
 <div class="hero">
   <div class="hero-glow"></div>
   <div class="hero-tag">🎓 Skoluppgift — AI-verktygsanalys</div>
@@ -270,10 +276,10 @@ footer .fp{font-size:.75rem;color:var(--muted);line-height:1.75;max-width:380px;
   <h2 class="reveal">Vad är <em>AI Hair Changer?</em></h2>
   <p class="lead reveal">AI Hair Changer är ett webbaserat verktyg som använder generativ AI för att låta användare prova olika frisyrer och hårfärger virtuellt — direkt i webbläsaren, utan installation.</p>
   <div class="about-grid reveal">
-    <div class="about-cell"><div class="icon">🏢</div><h3>Skapare & bakgrund</h3><p>Verktyget drivs av teamet bakom <strong style="color:var(--text)">aihairchanger.io</strong>. Det är ett av många AI-bildverktyg som vuxit fram när generativa modeller blivit konsumenttillgängliga. Exakt organisation publiceras inte öppet — vanligt bland webbaserade AI-tjänster i kategorin.</p></div>
+    <div class="about-cell"><div class="icon">🏢</div><h3>Skapare & bakgrund</h3><p>Verktyget drivs av teamet bakom <strong style="color:var(--text)">aihairchanger.io</strong>. Det är ett av många AI-bildverktyg som vuxit fram när generativa modeller blivit konsumenttillgängliga. Exakt organisation publiceras inte öppet — vanligt bland webbaserade AI-tjänster.</p></div>
     <div class="about-cell"><div class="icon">🎯</div><h3>Syfte & nytta</h3><p>Syftet är att eliminera risken med att byta frisyr. Istället för att gissa kan du ladda upp ett foto och förhandsgranska hundratals stilar. Verktyget hjälper till att fatta välgrundade beslut — utan att ta steget till frisören först.</p></div>
-    <div class="about-cell"><div class="icon">⚙️</div><h3>Tekniken bakom</h3><p>Verktyget använder <em style="color:var(--gold)">generativ AI</em> — sannolikt diffusionsmodeller (liknande tekniken bakom Stable Diffusion). AI:n analyserar ansiktsform och hårstruktur och applicerar nya frisyrer på ett hyperrealistiskt vis som ska likna riktiga fotografier.</p></div>
-    <div class="about-cell"><div class="icon">🔐</div><h3>Integritet & säkerhet</h3><p>Uppladdade foton raderas automatiskt efter <strong style="color:var(--text)">24 timmar</strong>. Ingen registrering eller inloggning krävs för grundfunktionerna — minimerar insamlingen av personuppgifter och gör verktyget tillgängligt för alla.</p></div>
+    <div class="about-cell"><div class="icon">⚙️</div><h3>Tekniken bakom</h3><p>Verktyget använder <em style="color:var(--gold)">generativ AI</em> — sannolikt diffusionsmodeller liknande Stable Diffusion. AI:n analyserar ansiktsform och hårstruktur och applicerar nya frisyrer på ett hyperrealistiskt vis som liknar riktiga fotografier.</p></div>
+    <div class="about-cell"><div class="icon">🔐</div><h3>Integritet & säkerhet</h3><p>Uppladdade foton raderas automatiskt efter <strong style="color:var(--text)">24 timmar</strong>. Ingen registrering eller inloggning krävs för grundfunktionerna — minimerar insamlingen av personuppgifter.</p></div>
   </div>
 </section>
 <hr class="divider"/>
@@ -281,106 +287,87 @@ footer .fp{font-size:.75rem;color:var(--muted);line-height:1.75;max-width:380px;
 <!-- 02 ANVÄNDNING -->
 <section id="anvandning">
   <div class="section-label reveal">02 — Hur det används</div>
-  <h2 class="reveal">Fyra enkla <em>steg</em></h2>
-  <p class="lead reveal">Verktyget kräver inga tekniska kunskaper. Ladda upp ditt foto nedan och se direkt hur du skulle se ut med olika frisyrer — precis som i det riktiga verktyget.</p>
+  <h2 class="reveal">Prova verktyget <em>direkt här</em></h2>
+  <p class="lead reveal">Ladda upp ditt foto och välj bland olika frisyrer nedan. Frisyrerna läggs direkt på din bild så att du kan se hur det ser ut på just dig.</p>
 
   <div class="steps reveal">
-    <div class="step"><span class="step-icon">📸</span><div class="step-num">01</div><h4>Ladda upp foto</h4><p>Välj ett tydligt foto framifrån med bra belysning. Ansiktet ska vara klart synligt.</p></div>
-    <div class="step"><span class="step-icon">🎭</span><div class="step-num">02</div><h4>Välj tillfälle</h4><p>Filtrera stilar efter tillfälle: arbete, bröllop, dejt, vardag eller festlighet.</p></div>
-    <div class="step"><span class="step-icon">✂️</span><div class="step-num">03</div><h4>Välj frisyr & färg</h4><p>Bläddra bland 100+ frisyrstilar och kombinera med ett brett urval hårfärger.</p></div>
-    <div class="step"><span class="step-icon">✨</span><div class="step-num">04</div><h4>Generera & spara</h4><p>AI:n skapar resultatet direkt. Ladda ner bilden eller dela den med din frisör.</p></div>
+    <div class="step"><span class="step-icon">📸</span><div class="step-num">01</div><h4>Ladda upp foto</h4><p>Välj ett foto framifrån med bra belysning. Ansiktet ska vara klart synligt.</p></div>
+    <div class="step"><span class="step-icon">🎭</span><div class="step-num">02</div><h4>Välj tillfälle</h4><p>Filtrera stilar efter tillfälle: arbete, bröllop, dejt eller fest.</p></div>
+    <div class="step"><span class="step-icon">✂️</span><div class="step-num">03</div><h4>Välj frisyr & färg</h4><p>Klicka på en frisyr i galleriet. Välj sedan hårfärg.</p></div>
+    <div class="step"><span class="step-icon">⬇️</span><div class="step-num">04</div><h4>Ladda ner</h4><p>Spara resultatet eller dela det med din frisör som referens.</p></div>
   </div>
 
-  <!-- ====== PROVA VERKTYGET ====== -->
-  <div class="reveal" style="margin-top:48px;">
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:4px;overflow:hidden;">
-
-      <!-- Header -->
-      <div style="background:var(--surface);padding:14px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
-        <div style="width:10px;height:10px;border-radius:50%;background:#E8634A;"></div>
-        <div style="width:10px;height:10px;border-radius:50%;background:#D4A017;"></div>
-        <div style="width:10px;height:10px;border-radius:50%;background:#6BAF7A;"></div>
-        <div style="flex:1;background:var(--card);border-radius:4px;padding:4px 14px;font-size:.72rem;color:var(--muted);text-align:center;">aihairchanger.io</div>
-      </div>
-
-      <!-- Content -->
-      <div style="padding:48px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:24px;">
-
-        <!-- Icon ring -->
-        <div style="width:80px;height:80px;border-radius:50%;background:rgba(201,169,110,.08);border:1px solid rgba(201,169,110,.2);display:flex;align-items:center;justify-content:center;font-size:2.2rem;">✂️</div>
-
-        <div>
-          <div style="font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:300;margin-bottom:8px;">Prova verktyget på riktigt</div>
-          <p style="font-size:.9rem;color:var(--muted);max-width:480px;line-height:1.75;">
-            Ladda upp ditt eget foto direkt på <strong style="color:var(--text)">aihairchanger.io</strong> och se hur du ser ut med 100+ olika frisyrer — genererade av riktig AI. Gratis, ingen registrering krävs.
-          </p>
-        </div>
-
-        <!-- Feature pills -->
-        <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">
-          <span style="background:rgba(201,169,110,.08);border:1px solid rgba(201,169,110,.2);color:var(--gold);padding:6px 16px;border-radius:20px;font-size:.76rem;">📸 Ladda upp foto</span>
-          <span style="background:rgba(201,169,110,.08);border:1px solid rgba(201,169,110,.2);color:var(--gold);padding:6px 16px;border-radius:20px;font-size:.76rem;">🎨 100+ frisyrer</span>
-          <span style="background:rgba(201,169,110,.08);border:1px solid rgba(201,169,110,.2);color:var(--gold);padding:6px 16px;border-radius:20px;font-size:.76rem;">✨ AI-genererat resultat</span>
-          <span style="background:rgba(201,169,110,.08);border:1px solid rgba(201,169,110,.2);color:var(--gold);padding:6px 16px;border-radius:20px;font-size:.76rem;">🔒 Foto raderas efter 24h</span>
-        </div>
-
-        <!-- Big CTA button -->
-        <a href="https://www.aihairchanger.io" target="_blank" rel="noopener noreferrer"
-           style="display:inline-flex;align-items:center;gap:12px;background:var(--gold);color:var(--bg);text-decoration:none;padding:16px 40px;border-radius:3px;font-size:.95rem;font-weight:600;font-family:'Outfit',sans-serif;letter-spacing:.04em;transition:background .2s,transform .2s;"
-           onmouseover="this.style.background='var(--gl)';this.style.transform='translateY(-2px)'"
-           onmouseout="this.style.background='var(--gold)';this.style.transform='translateY(0)'">
-          Öppna AI Hair Changer
-          <span style="font-size:1rem;">→</span>
-        </a>
-
-        <p style="font-size:.74rem;color:var(--muted);">Öppnas i en ny flik · Gratis att använda · aihairchanger.io</p>
-      </div>
-
-      <!-- How it looks — style showcase row -->
-      <div style="border-top:1px solid var(--border);padding:28px 32px;">
-        <div style="font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:20px;">Frisyrer du kan prova</div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:14px 18px;text-align:center;min-width:100px;">
-            <div style="font-size:1.6rem;margin-bottom:6px;">💇‍♀️</div>
-            <div style="font-size:.76rem;font-weight:500;">Pixie Cut</div>
-            <div style="font-size:.66rem;color:var(--muted);">Arbete</div>
-          </div>
-          <div style="background:var(--surface);border:1px solid rgba(201,169,110,.3);border-radius:3px;padding:14px 18px;text-align:center;min-width:100px;">
-            <div style="font-size:1.6rem;margin-bottom:6px;">🌊</div>
-            <div style="font-size:.76rem;font-weight:500;color:var(--gold);">Beach Waves</div>
-            <div style="font-size:.66rem;color:var(--muted);">Bröllop</div>
-          </div>
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:14px 18px;text-align:center;min-width:100px;">
-            <div style="font-size:1.6rem;margin-bottom:6px;">✂️</div>
-            <div style="font-size:.76rem;font-weight:500;">Bob</div>
-            <div style="font-size:.66rem;color:var(--muted);">Vardag</div>
-          </div>
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:14px 18px;text-align:center;min-width:100px;">
-            <div style="font-size:1.6rem;margin-bottom:6px;">🎀</div>
-            <div style="font-size:.76rem;font-weight:500;">Braids</div>
-            <div style="font-size:.66rem;color:var(--muted);">Fest</div>
-          </div>
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:14px 18px;text-align:center;min-width:100px;">
-            <div style="font-size:1.6rem;margin-bottom:6px;">🔮</div>
-            <div style="font-size:.76rem;font-weight:500;">Undercut</div>
-            <div style="font-size:.66rem;color:var(--muted);">Fest</div>
-          </div>
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:14px 18px;text-align:center;min-width:100px;">
-            <div style="font-size:1.6rem;margin-bottom:6px;">🪬</div>
-            <div style="font-size:.76rem;font-weight:500;">Loose Bun</div>
-            <div style="font-size:.66rem;color:var(--muted);">Arbete</div>
-          </div>
-          <div style="background:var(--surface);border:1px solid rgba(201,169,110,.2);border-radius:3px;padding:14px 18px;text-align:center;min-width:100px;">
-            <div style="font-size:1.6rem;margin-bottom:6px;">✨</div>
-            <div style="font-size:.76rem;font-weight:500;color:var(--muted);">+ 94 fler</div>
-            <div style="font-size:.66rem;color:var(--muted);">alla tillfällen</div>
-          </div>
-        </div>
-      </div>
-
+  <!-- ══════════════════════════════════════
+       HAIR CHANGER TOOL
+  ══════════════════════════════════════ -->
+  <div class="tool-box reveal" style="margin-top:40px;">
+    <div class="tool-bar">
+      <div class="tbar-dot" style="background:#E8634A"></div>
+      <div class="tbar-dot" style="background:#D4A017"></div>
+      <div class="tbar-dot" style="background:#6BAF7A"></div>
+      <div class="tbar-url">✂️ AI Hair Changer — Interaktiv demo</div>
     </div>
-  </div>
 
+    <div class="tool-inner">
+
+      <!-- LEFT: photo + controls -->
+      <div class="tool-left">
+        <!-- Upload zone -->
+        <div class="upload-zone" id="uploadZone"
+             ondragover="dzOver(event)" ondragleave="dzLeave()" ondrop="dzDrop(event)">
+          <input type="file" accept="image/*" id="fileIn" onchange="loadPhoto(this.files[0])"/>
+          <div class="uz-icon">📸</div>
+          <div class="uz-text">Dra & släpp ditt foto här</div>
+          <div class="uz-hint">JPG · PNG · WEBP · klicka för att välja</div>
+          <button class="uz-btn">Välj foto</button>
+        </div>
+
+        <!-- Photo after upload -->
+        <div class="photo-preview" id="photoPreview">
+          <img id="userPhoto" src="" alt="Ditt foto"/>
+          <canvas id="hairCanvas"></canvas>
+        </div>
+        <button class="change-btn" id="changeBtn" style="display:none" onclick="resetPhoto()">× Byt foto</button>
+
+        <!-- Color picker -->
+        <div class="tool-controls" id="colorControls" style="display:none">
+          <div class="ctrl-label">Hårfärg</div>
+          <div class="color-pills" id="colorPills"></div>
+        </div>
+
+        <!-- Occasion filter -->
+        <div class="tool-controls" id="occControls" style="display:none">
+          <div class="ctrl-label">Filtrera efter tillfälle</div>
+          <div class="ctrl-pills" id="occPills"></div>
+        </div>
+
+        <div class="status-bar" id="statusBar">
+          <div class="status-dot" id="statusDot"></div>
+          <span id="statusText">Ladda upp ett foto för att börja</span>
+        </div>
+      </div>
+
+      <!-- RIGHT: gallery -->
+      <div class="tool-right">
+        <div style="padding:14px 16px;border-bottom:1px solid var(--border);font-size:.72rem;color:var(--muted);display:flex;justify-content:space-between;align-items:center;">
+          <span id="galleryInfo">Välj en frisyr att prova</span>
+          <span id="galleryCount" style="color:var(--gold);font-size:.68rem;"></span>
+        </div>
+        <div class="hair-gallery" id="hairGallery"></div>
+        <div class="result-area" id="resultArea">
+          <div class="result-info">
+            <div class="ri-name" id="resName"></div>
+            <div class="ri-sub" id="resSub"></div>
+          </div>
+          <div class="result-btns">
+            <button class="rbtn primary" onclick="downloadResult()">⬇ Ladda ner</button>
+            <button class="rbtn" onclick="doShare()">↗ Dela</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /tool-inner -->
+  </div><!-- /tool-box -->
 </section>
 <hr class="divider"/>
 
@@ -393,9 +380,9 @@ footer .fp{font-size:.75rem;color:var(--muted);line-height:1.75;max-width:380px;
     <div class="aud-card"><div class="aud-emoji">💼</div><h4>Vardagskonsumenten</h4><p>Privatpersoner som är nyfikna på en ny frisyr inför en viktig händelse. Inga tekniska krav — om du kan ladda upp ett foto kan du använda verktyget.</p></div>
     <div class="aud-card"><div class="aud-emoji">💍</div><h4>Bröllopspar & firande</h4><p>Tillfällesfiltret gör det lätt att hitta passande frisyrer specifikt för bröllop, fest eller högtidliga tillfällen.</p></div>
     <div class="aud-card"><div class="aud-emoji">✂️</div><h4>Frisörer & stylister</h4><p>Professionella frisörer kan använda verktyget som konsultationshjälpmedel — visa kunden hur en tänkt frisyr ser ut på just dem.</p></div>
-    <div class="aud-card"><div class="aud-emoji">📱</div><h4>Ungdomar & trendintresserade</h4><p>Yngre användare som vill experimentera med färger och stilar utan att binda upp sig — ett trygghetsnät före ett djärvt beslut.</p></div>
-    <div class="aud-card"><div class="aud-emoji">🎭</div><h4>Content creators</h4><p>Influencers inom beauty och mode kan skapa "before & after"-innehåll eller diskutera hårtrender med hjälp av verktyget.</p></div>
-    <div class="aud-card"><div class="aud-emoji">🌍</div><h4>Global tillgänglighet</h4><p>Gratis, webbaserat och utan registrering — tillgängligt för vem som helst med en enhet och internetuppkoppling.</p></div>
+    <div class="aud-card"><div class="aud-emoji">📱</div><h4>Ungdomar & trendintresserade</h4><p>Yngre användare som vill experimentera med färger och stilar utan att binda upp sig.</p></div>
+    <div class="aud-card"><div class="aud-emoji">🎭</div><h4>Content creators</h4><p>Influencers inom beauty och mode kan skapa "before & after"-innehåll eller diskutera hårtrender.</p></div>
+    <div class="aud-card"><div class="aud-emoji">🌍</div><h4>Global tillgänglighet</h4><p>Gratis, webbaserat och utan registrering — tillgängligt för vem som helst med en enhet och internet.</p></div>
   </div>
 </section>
 <hr class="divider"/>
@@ -415,8 +402,8 @@ footer .fp{font-size:.75rem;color:var(--muted);line-height:1.75;max-width:380px;
     </div>
     <div>
       <div style="background:var(--card);border:1px solid var(--border);padding:24px;border-radius:2px;margin-bottom:12px;">
-        <div style="font-size:.67rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">Urval av tillgängliga stilar</div>
-        <div class="style-tags">
+        <div style="font-size:.67rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">Tillgängliga stilar</div>
+        <div class="stags">
           <span class="stag">Pixie Cut</span><span class="stag hi">Beach Waves</span><span class="stag">Bob</span>
           <span class="stag">Braids</span><span class="stag">Curtain Bangs</span><span class="stag hi">Loose Bun</span>
           <span class="stag">Lob</span><span class="stag">Undercut</span><span class="stag">Afro</span>
@@ -424,7 +411,7 @@ footer .fp{font-size:.75rem;color:var(--muted);line-height:1.75;max-width:380px;
         </div>
       </div>
       <div style="background:var(--card);border:1px solid var(--border);padding:24px;border-radius:2px;">
-        <div style="font-size:.67rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">Hårfärgspanel</div>
+        <div style="font-size:.67rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">Hårfärger</div>
         <div class="swatches">
           <div class="sw"><div class="sw-c" style="background:#1A0A00"></div><span>Svart</span></div>
           <div class="sw"><div class="sw-c" style="background:#6B3A2A"></div><span>Brun</span></div>
@@ -445,17 +432,17 @@ footer .fp{font-size:.75rem;color:var(--muted);line-height:1.75;max-width:380px;
 <section id="begransningar">
   <div class="section-label reveal">05 — Begränsningar</div>
   <h2 class="reveal">Vad bör man<br><em>känna till?</em></h2>
-  <p class="lead reveal">Alla verktyg har sina gränser. Här är en transparent genomgång av kända begränsningar — kostnad, versioner och tekniska krav.</p>
+  <p class="lead reveal">Alla verktyg har sina gränser. Här är en transparent genomgång av kända begränsningar.</p>
   <table class="ltable reveal">
     <thead><tr><th>Begränsning</th><th>Detaljer</th><th>Status</th></tr></thead>
     <tbody>
-      <tr><td><strong>Gratis vs premium</strong></td><td>Grundfunktioner är gratis. Fler genereringar, högre upplösning och prioritetsbearbetning kräver betalabonnemang. Exakt pris bör kontrolleras direkt på sajten.</td><td><span class="badge bw">Freemium</span></td></tr>
-      <tr><td><strong>Genereringsgräns (gratis)</strong></td><td>Gratisanvändare har ett begränsat antal genereringar per dag/månad — liknande ett "token"-system. Exakt antal kan ändras utan förvarning.</td><td><span class="badge bw">Begränsat</span></td></tr>
-      <tr><td><strong>Fotokvalitetskrav</strong></td><td>Resultaten påverkas kraftigt av inputfotots kvalitet. Dålig belysning, suddig bild eller extrem vinkel ger märkbart sämre AI-resultat.</td><td><span class="badge bw">Krav</span></td></tr>
-      <tr><td><strong>Realism varierar</strong></td><td>Kan se digitalt bearbetad ut vid ovanliga ansiktsformer eller komplexa frisyrer — trots "hyperrealistiska" påståenden.</td><td><span class="badge bi">Varierar</span></td></tr>
-      <tr><td><strong>Ingen 3D- eller videovisning</strong></td><td>Resultaten är statiska 2D-bilder framifrån. Ingen möjlighet att se frisyren från sidan, bakifrån eller i rörelse.</td><td><span class="badge bw">Saknas</span></td></tr>
-      <tr><td><strong>Dataskydd & lagring</strong></td><td>Foton raderas efter 24 timmar men behandlas på externa servrar under den perioden.</td><td><span class="badge bo">24h-radering</span></td></tr>
-      <tr><td><strong>Kräver internet</strong></td><td>All bearbetning sker i molnet. Inget offlineläge finns tillgängligt.</td><td><span class="badge bw">Online only</span></td></tr>
+      <tr><td><strong>Gratis vs premium</strong></td><td>Grundfunktioner är gratis. Fler genereringar, högre upplösning och prioritetsbearbetning kräver betalabonnemang.</td><td><span class="badge bw">Freemium</span></td></tr>
+      <tr><td><strong>Genereringsgräns (gratis)</strong></td><td>Gratisanvändare har ett begränsat antal genereringar per dag/månad — liknande ett "token"-system.</td><td><span class="badge bw">Begränsat</span></td></tr>
+      <tr><td><strong>Fotokvalitetskrav</strong></td><td>Resultaten påverkas kraftigt av inputfotots kvalitet. Dålig belysning eller suddig bild ger sämre resultat.</td><td><span class="badge bw">Krav</span></td></tr>
+      <tr><td><strong>Realism varierar</strong></td><td>Kan se digitalt bearbetad ut vid ovanliga ansiktsformer eller komplexa frisyrer.</td><td><span class="badge bi">Varierar</span></td></tr>
+      <tr><td><strong>Ingen 3D-visning</strong></td><td>Resultaten är statiska 2D-bilder framifrån. Ingen möjlighet att se frisyren från sidan eller bakifrån.</td><td><span class="badge bw">Saknas</span></td></tr>
+      <tr><td><strong>Dataskydd</strong></td><td>Foton raderas efter 24 timmar men behandlas på externa servrar under den perioden.</td><td><span class="badge bo">24h-radering</span></td></tr>
+      <tr><td><strong>Kräver internet</strong></td><td>All AI-bearbetning sker i molnet. Inget offlineläge finns.</td><td><span class="badge bw">Online only</span></td></tr>
       <tr><td><strong>Enbart engelska</strong></td><td>Gränssnittet är primärt på engelska. Begränsat stöd för andra språk.</td><td><span class="badge bi">Engelska</span></td></tr>
     </tbody>
   </table>
@@ -468,67 +455,11 @@ footer .fp{font-size:.75rem;color:var(--muted);line-height:1.75;max-width:380px;
   <h2 class="reveal">Hur gick arbetet<br><em>till?</em></h2>
   <p class="lead reveal">Dokumentation av de steg som togs för att testa, analysera och presentera AI Hair Changer.</p>
   <div class="proc-timeline">
-    <div class="proc-step reveal">
-      <div class="proc-num">1</div>
-      <div class="proc-content">
-        <h4>Hitta och välja verktyget</h4>
-        <p>Sökte efter AI-verktyg inom mode och utseende. AI Hair Changer valdes för att det kombinerar tydlig nytta, intressant AI-teknik och en bred målgrupp.</p>
-        <div class="info-box">🔍 Googlade "best free AI hairstyle changer 2024" — AI Hair Changer dök upp bland toppresultaten. Verktyget testades direkt utan att registrera konto.</div>
-      </div>
-    </div>
-    <div class="proc-step reveal">
-      <div class="proc-num">2</div>
-      <div class="proc-content">
-        <h4>Utforska gränssnittet</h4>
-        <p>Besökte aihairchanger.io och dokumenterade hur gränssnittet ser ut och fungerar.</p>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
-          <span style="background:var(--card);border:1px solid var(--green);color:var(--green);padding:5px 12px;border-radius:2px;font-size:.73rem;">✓ Ingen inloggning</span>
-          <span style="background:var(--card);border:1px solid var(--green);color:var(--green);padding:5px 12px;border-radius:2px;font-size:.73rem;">✓ Tydlig layout</span>
-          <span style="background:var(--card);border:1px solid var(--green);color:var(--green);padding:5px 12px;border-radius:2px;font-size:.73rem;">✓ Filter direkt synliga</span>
-          <span style="background:var(--card);border:1px solid var(--accent);color:var(--accent);padding:5px 12px;border-radius:2px;font-size:.73rem;">⚠ Engelska only</span>
-        </div>
-      </div>
-    </div>
-    <div class="proc-step reveal">
-      <div class="proc-num">3</div>
-      <div class="proc-content">
-        <h4>Testa verktyget i praktiken</h4>
-        <p>Testade tre kombinationer för att bedöma kvalitet och realism.</p>
-        <div class="tcards">
-          <div class="tcard"><div class="ti">✂️</div><div class="tl">Test 1</div><div class="td">Pixie cut · Mörkbrun · Arbete</div><div class="tr tr-ok">✓ Mycket realistisk</div></div>
-          <div class="tcard"><div class="ti">🌊</div><div class="tl">Test 2</div><div class="td">Beach waves · Blond · Bröllop</div><div class="tr tr-ok">✓ Imponerande</div></div>
-          <div class="tcard"><div class="ti">💜</div><div class="tl">Test 3</div><div class="td">Lila bob · Lila · Fest</div><div class="tr tr-warn">⚠ Lite artificiell</div></div>
-        </div>
-      </div>
-    </div>
-    <div class="proc-step reveal">
-      <div class="proc-num">4</div>
-      <div class="proc-content">
-        <h4>Undersöka prissättning</h4>
-        <p>Besökte prissidan och kartlade skillnaderna mellan gratis- och premiumversionen.</p>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px;">
-          <div style="flex:1;min-width:130px;background:var(--card);border:1px solid var(--border);border-radius:3px;padding:16px;">
-            <div style="font-size:.67rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Gratis · $0</div>
-            <div style="font-size:.77rem;color:var(--muted);line-height:1.9;">✓ Begränsade genereringar<br>✓ Standardupplösning<br>✗ Ingen köprioritet</div>
-          </div>
-          <div style="flex:1;min-width:130px;background:var(--card);border:1px solid var(--gold);border-radius:3px;padding:16px;">
-            <div style="font-size:.67rem;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Premium · Varierar</div>
-            <div style="font-size:.77rem;color:var(--muted);line-height:1.9;">✓ Fler/obegränsade bilder<br>✓ HD-resultat<br>✓ Snabbare generering</div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="proc-step reveal">
-      <div class="proc-num">5</div>
-      <div class="proc-content">
-        <h4>Bygga presentationswebbsidan</h4>
-        <p>All insamlad information sammanställdes till denna webbsida. AI användes som hjälpmedel för textgenerering och kodproduktion.</p>
-        <div class="info-box" style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;">
-          <div><strong style="color:var(--text);font-size:.85rem;">Claude (Anthropic)</strong><br><span style="font-size:.75rem;">Textgenerering, struktur & HTML/CSS-kod</span></div>
-          <div style="border-left:1px solid var(--border);padding-left:14px;"><strong style="color:var(--gold);font-size:.85rem;">AI Hair Changer</strong><br><span style="font-size:.75rem;">Det analyserade och testade verktyget</span></div>
-        </div>
-      </div>
-    </div>
+    <div class="proc-step reveal"><div class="proc-num">1</div><div class="proc-content"><h4>Hitta och välja verktyget</h4><p>Sökte efter AI-verktyg inom mode och utseende. AI Hair Changer valdes för att det kombinerar tydlig nytta, intressant AI-teknik och en bred målgrupp.</p><div class="info-box">🔍 Googlade "best free AI hairstyle changer 2024" — AI Hair Changer dök upp bland toppresultaten. Verktyget testades direkt utan registrering.</div></div></div>
+    <div class="proc-step reveal"><div class="proc-num">2</div><div class="proc-content"><h4>Utforska gränssnittet</h4><p>Besökte aihairchanger.io och dokumenterade hur gränssnittet ser ut och fungerar.</p><div style="display:flex;gap:8px;flex-wrap:wrap;"><span style="background:var(--card);border:1px solid var(--green);color:var(--green);padding:5px 12px;border-radius:2px;font-size:.73rem;">✓ Ingen inloggning</span><span style="background:var(--card);border:1px solid var(--green);color:var(--green);padding:5px 12px;border-radius:2px;font-size:.73rem;">✓ Tydlig layout</span><span style="background:var(--card);border:1px solid var(--accent);color:var(--accent);padding:5px 12px;border-radius:2px;font-size:.73rem;">⚠ Engelska only</span></div></div></div>
+    <div class="proc-step reveal"><div class="proc-num">3</div><div class="proc-content"><h4>Testa verktyget i praktiken</h4><p>Testade tre kombinationer för att bedöma kvalitet och realism.</p><div class="tcards"><div class="tcard"><div class="ti">✂️</div><div class="tl">Test 1</div><div class="td">Pixie cut · Mörkbrun · Arbete</div><div class="tr2 tr-ok">✓ Realistisk</div></div><div class="tcard"><div class="ti">🌊</div><div class="tl">Test 2</div><div class="td">Beach waves · Blond · Bröllop</div><div class="tr2 tr-ok">✓ Imponerande</div></div><div class="tcard"><div class="ti">💜</div><div class="tl">Test 3</div><div class="td">Lila bob · Lila · Fest</div><div class="tr2 tr-warn">⚠ Lite artificiell</div></div></div></div></div>
+    <div class="proc-step reveal"><div class="proc-num">4</div><div class="proc-content"><h4>Undersöka prissättning</h4><p>Kartlade skillnaderna mellan gratis- och premiumversionen.</p><div style="display:flex;gap:12px;flex-wrap:wrap;"><div style="flex:1;min-width:130px;background:var(--card);border:1px solid var(--border);border-radius:3px;padding:16px;"><div style="font-size:.67rem;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">Gratis · $0</div><div style="font-size:.77rem;color:var(--muted);line-height:1.9;">✓ Begränsade gen.<br>✓ Standardupplösning<br>✗ Ingen köprioritet</div></div><div style="flex:1;min-width:130px;background:var(--card);border:1px solid var(--gold);border-radius:3px;padding:16px;"><div style="font-size:.67rem;color:var(--gold);text-transform:uppercase;margin-bottom:8px;">Premium · Varierar</div><div style="font-size:.77rem;color:var(--muted);line-height:1.9;">✓ Fler/obegränsade<br>✓ HD-resultat<br>✓ Snabbare</div></div></div></div></div>
+    <div class="proc-step reveal"><div class="proc-num">5</div><div class="proc-content"><h4>Bygga webbsidan</h4><p>All information sammanställdes till denna sida. Claude (Anthropic) användes för textgenerering och HTML/CSS-kod.</p><div class="info-box" style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;"><div><strong style="color:var(--text);font-size:.85rem;">Claude (Anthropic)</strong><br><span style="font-size:.75rem;">Text, struktur & kod</span></div><div style="border-left:1px solid var(--border);padding-left:14px;"><strong style="color:var(--gold);font-size:.85rem;">AI Hair Changer</strong><br><span style="font-size:.75rem;">Analyserat verktyg</span></div></div></div></div>
   </div>
 </section>
 <hr class="divider"/>
@@ -539,28 +470,8 @@ footer .fp{font-size:.75rem;color:var(--muted);line-height:1.75;max-width:380px;
   <h2 class="reveal">Vad är mitt<br><em>omdöme?</em></h2>
   <p class="lead reveal">En balanserad bedömning baserad på faktisk testning — styrkor, svagheter och slutbetyg.</p>
   <div class="eval-grid reveal">
-    <div class="eval-card pos">
-      <h4>✓ Styrkor</h4>
-      <ul class="eval-list">
-        <li>Extremt lättanvänt — inga tekniska kunskaper krävs</li>
-        <li>Imponerande bredd med 100+ stilar och rikt färgurval</li>
-        <li>Gratis basversion gör verktyget tillgängligt för alla</li>
-        <li>Integritetsvänligt med automatisk 24-timmars radering</li>
-        <li>Tillfälles- och könsfiltret hjälper att hitta rätt snabbt</li>
-        <li>Resultaten är i många fall häpnadsväckande realistiska</li>
-      </ul>
-    </div>
-    <div class="eval-card neg">
-      <h4>⚠ Svagheter</h4>
-      <ul class="eval-list">
-        <li>Resultatkvaliteten varierar beroende på fotokvalitet</li>
-        <li>Gratisgränsen begränsar antalet genereringar märkbart</li>
-        <li>Inga 3D- eller videovyer — bara statiska framifrånbilder</li>
-        <li>Gränssnittet är enbart på engelska</li>
-        <li>Kan se digitalt bearbetad ut vid ovanliga ansiktsformer</li>
-        <li>Oklart exakt hur länge foton lagras och vem som har tillgång</li>
-      </ul>
-    </div>
+    <div class="eval-card pos"><h4>✓ Styrkor</h4><ul class="eval-list"><li>Extremt lättanvänt — inga tekniska kunskaper krävs</li><li>Imponerande bredd med 100+ stilar och rikt färgurval</li><li>Gratis basversion gör verktyget tillgängligt för alla</li><li>Integritetsvänligt med automatisk 24-timmars radering</li><li>Tillfälles- och könsfiltret hjälper att hitta rätt snabbt</li><li>Resultaten är i många fall häpnadsväckande realistiska</li></ul></div>
+    <div class="eval-card neg"><h4>⚠ Svagheter</h4><ul class="eval-list"><li>Resultatkvaliteten varierar beroende på fotokvalitet</li><li>Gratisgränsen begränsar antalet genereringar märkbart</li><li>Inga 3D- eller videovyer — bara statiska framifrånbilder</li><li>Gränssnittet är enbart på engelska</li><li>Kan se digitalt bearbetad ut vid ovanliga ansiktsformer</li><li>Oklart exakt hur länge foton lagras på servrar</li></ul></div>
   </div>
   <div style="margin-top:44px;" class="reveal">
     <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;margin-bottom:6px;">Betygsättning</h3>
@@ -571,24 +482,20 @@ footer .fp{font-size:.75rem;color:var(--muted);line-height:1.75;max-width:380px;
       <div class="rating-row"><span class="rating-label">Stilurval</span><div class="rating-track"><div class="rating-fill" style="width:90%"></div></div><span class="rating-score">9.0</span></div>
       <div class="rating-row"><span class="rating-label">Integritetsskydd</span><div class="rating-track"><div class="rating-fill" style="width:70%"></div></div><span class="rating-score">7.0</span></div>
       <div class="rating-row"><span class="rating-label">Värde för pengarna</span><div class="rating-track"><div class="rating-fill" style="width:80%"></div></div><span class="rating-score">8.0</span></div>
-      <div class="rating-row" style="border-top:1px solid var(--border);padding-top:13px;margin-top:3px;">
-        <span class="rating-label" style="font-weight:600;color:var(--text)">Totalt omdöme</span>
-        <div class="rating-track"><div class="rating-fill" style="width:82%;background:linear-gradient(to right,var(--accent),var(--gl))"></div></div>
-        <span class="rating-score" style="font-size:1rem">8.2</span>
-      </div>
+      <div class="rating-row" style="border-top:1px solid var(--border);padding-top:13px;margin-top:3px;"><span class="rating-label" style="font-weight:600;color:var(--text)">Totalt omdöme</span><div class="rating-track"><div class="rating-fill" style="width:82%;background:linear-gradient(to right,var(--accent),var(--gl))"></div></div><span class="rating-score" style="font-size:1rem">8.2</span></div>
     </div>
   </div>
   <div class="concl reveal">
     <div class="cl">Slutsats</div>
     <p>AI Hair Changer är ett <em style="color:var(--gl)">genuint användbart och imponerande</em> verktyg för den som vill prova nya frisyrer riskfritt.</p>
-    <p>Det löser ett verkligt problem på ett enkelt sätt och gör avancerad AI-teknik tillgänglig utan tekniska krav. Gratisversionen räcker för att bilda sig en bra uppfattning, men för regelbunden användning krävs ett premiumabonnemang. Verktyget rekommenderas varmt till privatpersoner, frisörer och alla som funderar på att byta stil — men vill se resultatet innan de bestämmer sig.</p>
+    <p>Det löser ett verkligt problem på ett enkelt sätt och gör avancerad AI-teknik tillgänglig utan tekniska krav. Gratisversionen räcker för att bilda sig en bra uppfattning, men för regelbunden användning krävs ett premiumabonnemang. Verktyget rekommenderas varmt till privatpersoner, frisörer och alla som funderar på att byta stil men vill se resultatet innan de bestämmer sig.</p>
   </div>
 </section>
 
 <footer>
   <div>
     <div class="footer-logo">AI Hair Changer</div>
-    <p class="fp">Skoluppgift: Presentation och utvärdering av ett AI-verktyg.<br>Webbsida skapad med HTML & CSS. Claude (Anthropic) användes för textgenerering och kodproduktion.</p>
+    <p class="fp">Skoluppgift: Presentation och utvärdering av ett AI-verktyg.<br>Skapad med HTML & CSS. Claude (Anthropic) användes för textgenerering och kod.</p>
   </div>
   <div class="footer-right">
     <p>Analyserat verktyg: <strong style="color:var(--text)">aihairchanger.io</strong></p>
@@ -597,358 +504,428 @@ footer .fp{font-size:.75rem;color:var(--muted);line-height:1.75;max-width:380px;
   </div>
 </footer>
 
+<!-- ══════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════ -->
 <script>
 // ── NAV ──
-function navClick(e,id){e.preventDefault();goTo(id);document.getElementById('navLinks').classList.remove('open')}
-function toggleNav(){document.getElementById('navLinks').classList.toggle('open')}
+function navTo(e,id){e.preventDefault();goTo(id);document.getElementById('navLinks').classList.remove('open')}
 function goTo(id){const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'})}
 
 // ── REVEAL ──
-const reveals=document.querySelectorAll('.reveal');
-new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.07}).observe||
-new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.07});
-(()=>{const o=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.07});reveals.forEach(r=>o.observe(r))})();
+(()=>{const o=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.07});document.querySelectorAll('.reveal').forEach(r=>o.observe(r))})();
 
 // ── NOTIF ──
-function notif(msg){const n=document.getElementById('notif');n.textContent=msg;n.classList.add('show');setTimeout(()=>n.classList.remove('show'),2600)}
+function notif(msg,dur=2600){const n=document.getElementById('notif');n.textContent=msg;n.classList.add('show');setTimeout(()=>n.classList.remove('show'),dur)}
 
-// ── HAIRSTYLE DATA ──
-// Each style: id, name, color(hex), occasion, colorName, shape description
-const STYLES=[
-  // LONG
-  {id:'beach-waves-blond', name:'Beach Waves',    color:'#C8A84B', colorName:'Blond',  occ:'Bröllop', shape:'long-wavy'},
-  {id:'beach-waves-brun',  name:'Beach Waves',    color:'#6B3A2A', colorName:'Brun',   occ:'Vardag',  shape:'long-wavy'},
-  {id:'long-straight-svart',name:'Long Straight', color:'#1A0A00', colorName:'Svart',  occ:'Vardag',  shape:'long-straight'},
-  {id:'long-red',          name:'Long Straight',  color:'#A52010', colorName:'Röd',    occ:'Fest',    shape:'long-straight'},
-  {id:'long-lila',         name:'Long Wavy',      color:'#6B2FA0', colorName:'Lila',   occ:'Fest',    shape:'long-wavy'},
-  {id:'loose-bun-brun',    name:'Loose Bun',      color:'#6B3A2A', colorName:'Brun',   occ:'Arbete',  shape:'bun'},
-  {id:'loose-bun-blond',   name:'Loose Bun',      color:'#C8A84B', colorName:'Blond',  occ:'Bröllop', shape:'bun'},
-  // BOB / MEDIUM
-  {id:'bob-svart',         name:'Bob',            color:'#1A0A00', colorName:'Svart',  occ:'Arbete',  shape:'bob'},
-  {id:'bob-lila',          name:'Bob',            color:'#6B2FA0', colorName:'Lila',   occ:'Fest',    shape:'bob'},
-  {id:'bob-röd',           name:'Bob',            color:'#A52010', colorName:'Röd',    occ:'Fest',    shape:'bob'},
-  {id:'lob-brun',          name:'Lob',            color:'#6B3A2A', colorName:'Brun',   occ:'Vardag',  shape:'lob'},
-  {id:'lob-blond',         name:'Lob',            color:'#C8A84B', colorName:'Blond',  occ:'Arbete',  shape:'lob'},
-  // SHORT
-  {id:'pixie-svart',       name:'Pixie Cut',      color:'#1A0A00', colorName:'Svart',  occ:'Vardag',  shape:'pixie'},
-  {id:'pixie-brun',        name:'Pixie Cut',      color:'#6B3A2A', colorName:'Brun',   occ:'Arbete',  shape:'pixie'},
-  {id:'undercut-svart',    name:'Undercut',       color:'#1A0A00', colorName:'Svart',  occ:'Fest',    shape:'undercut'},
-  {id:'undercut-röd',      name:'Undercut',       color:'#A52010', colorName:'Röd',    occ:'Fest',    shape:'undercut'},
-  // BRAIDS / UP
-  {id:'braids-brun',       name:'Braids',         color:'#6B3A2A', colorName:'Brun',   occ:'Vardag',  shape:'braids'},
-  {id:'braids-blond',      name:'Braids',         color:'#C8A84B', colorName:'Blond',  occ:'Bröllop', shape:'braids'},
-  {id:'french-twist-svart',name:'French Twist',   color:'#1A0A00', colorName:'Svart',  occ:'Bröllop', shape:'updo'},
-  {id:'french-twist-brun', name:'French Twist',   color:'#6B3A2A', colorName:'Brun',   occ:'Arbete',  shape:'updo'},
-  // CURTAIN BANGS
-  {id:'bangs-blond',       name:'Curtain Bangs',  color:'#C8A84B', colorName:'Blond',  occ:'Vardag',  shape:'bangs'},
-  {id:'bangs-röd',         name:'Curtain Bangs',  color:'#A52010', colorName:'Röd',    occ:'Dejt',    shape:'bangs'},
-  {id:'bangs-lila',        name:'Curtain Bangs',  color:'#6B2FA0', colorName:'Lila',   occ:'Fest',    shape:'bangs'},
-  // AFRO / CURLY
-  {id:'afro-svart',        name:'Afro',           color:'#1A0A00', colorName:'Svart',  occ:'Vardag',  shape:'afro'},
-  {id:'curly-brun',        name:'Curly',          color:'#6B3A2A', colorName:'Brun',   occ:'Vardag',  shape:'curly'},
+// ═══════════════════════════════════
+// HAIR STYLES DATA
+// Each style has an SVG path that draws realistic hair shapes
+// The SVG is rendered into a canvas and composited over the photo
+// ═══════════════════════════════════
+const COLORS = [
+  {name:'Svart',  hex:'#0D0805', label:'🖤'},
+  {name:'Brun',   hex:'#5C2E0E', label:'🤎'},
+  {name:'Kastanj',hex:'#8B3A0F', label:'🟫'},
+  {name:'Blond',  hex:'#C8A040', label:'💛'},
+  {name:'Röd',    hex:'#8B1A0A', label:'❤️'},
+  {name:'Lila',   hex:'#5B1E7A', label:'💜'},
+  {name:'Silver', hex:'#AAAAAA', label:'🩶'},
+  {name:'Pastell',hex:'#7EC8C8', label:'🩵'},
 ];
 
-// ── FILTERS STATE ──
-let activeOcc='Alla', activeCol='Alla';
-function applyFilter(type,btn,val){
-  btn.closest('.filter-btns').querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  if(type==='occ')activeOcc=val; else activeCol=val;
-  renderGallery();
+const OCCASIONS = ['Alla','Vardag','Arbete','Bröllop','Fest','Dejt'];
+
+// Hair styles — SVG viewBox 0 0 200 220, face roughly centered at (100,130), radius ~45
+const STYLES = [
+  {
+    id:'long-straight', name:'Long Straight', occ:'Vardag',
+    svg:`
+      <path d="M55,60 Q50,40 100,35 Q150,40 145,60 L148,210 Q130,218 100,220 Q70,218 52,210 Z" fill="COLOR"/>
+      <path d="M55,60 Q52,80 50,130 Q48,170 52,210 Q60,215 70,212 L68,100 Q65,75 62,60 Z" fill="COLORDARK"/>
+      <path d="M145,60 Q148,80 150,130 Q152,170 148,210 Q140,215 130,212 L132,100 Q135,75 138,60 Z" fill="COLORDARK"/>
+      <ellipse cx="100" cy="52" rx="47" ry="24" fill="COLOR"/>
+    `
+  },
+  {
+    id:'long-wavy', name:'Beach Waves', occ:'Bröllop',
+    svg:`
+      <path d="M55,58 Q50,38 100,33 Q150,38 145,58 L142,215 Q120,222 100,220 Q80,222 58,215 Z" fill="COLOR"/>
+      <path d="M55,58 Q45,90 48,120 Q44,150 50,180 Q46,200 52,215 Q62,218 68,212 Q62,195 66,170 Q60,145 64,115 Q60,85 65,60 Z" fill="COLORDARK"/>
+      <path d="M145,58 Q155,90 152,120 Q156,150 150,180 Q154,200 148,215 Q138,218 132,212 Q138,195 134,170 Q140,145 136,115 Q140,85 135,60 Z" fill="COLORDARK"/>
+      <path d="M58,120 Q50,130 55,145 Q50,158 58,168" stroke="COLORLIGHT" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M142,120 Q150,130 145,145 Q150,158 142,168" stroke="COLORLIGHT" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <ellipse cx="100" cy="50" rx="47" ry="22" fill="COLOR"/>
+    `
+  },
+  {
+    id:'bob', name:'Bob', occ:'Arbete',
+    svg:`
+      <path d="M57,62 Q52,40 100,36 Q148,40 143,62 L143,148 Q140,158 100,162 Q60,158 57,148 Z" fill="COLOR"/>
+      <path d="M57,62 Q53,85 53,120 Q52,142 57,148 Q60,152 67,152 L65,90 Q62,72 60,62 Z" fill="COLORDARK"/>
+      <path d="M143,62 Q147,85 147,120 Q148,142 143,148 Q140,152 133,152 L135,90 Q138,72 140,62 Z" fill="COLORDARK"/>
+      <path d="M57,148 Q78,165 100,166 Q122,165 143,148" stroke="COLORLIGHT" stroke-width="2.5" fill="none"/>
+      <ellipse cx="100" cy="52" rx="46" ry="22" fill="COLOR"/>
+    `
+  },
+  {
+    id:'lob', name:'Lob', occ:'Vardag',
+    svg:`
+      <path d="M56,60 Q51,39 100,35 Q149,39 144,60 L144,178 Q122,188 100,190 Q78,188 56,178 Z" fill="COLOR"/>
+      <path d="M56,60 Q52,85 52,130 Q51,158 56,178 Q62,183 68,180 L66,105 Q63,78 60,60 Z" fill="COLORDARK"/>
+      <path d="M144,60 Q148,85 148,130 Q149,158 144,178 Q138,183 132,180 L134,105 Q137,78 140,60 Z" fill="COLORDARK"/>
+      <ellipse cx="100" cy="51" rx="46" ry="22" fill="COLOR"/>
+    `
+  },
+  {
+    id:'pixie', name:'Pixie Cut', occ:'Arbete',
+    svg:`
+      <ellipse cx="100" cy="54" rx="47" ry="26" fill="COLOR"/>
+      <path d="M56,66 Q53,80 54,100 Q56,112 62,116 Q68,108 68,88 Q66,74 62,66 Z" fill="COLOR"/>
+      <path d="M144,66 Q147,80 146,100 Q144,112 138,116 Q132,108 132,88 Q134,74 138,66 Z" fill="COLOR"/>
+      <path d="M62,66 Q70,58 100,55 Q130,58 138,66" stroke="COLORLIGHT" stroke-width="2" fill="none"/>
+      <path d="M68,116 Q84,125 100,126 Q116,125 132,116" stroke="COLORDARK" stroke-width="2" fill="none"/>
+    `
+  },
+  {
+    id:'undercut', name:'Undercut', occ:'Fest',
+    svg:`
+      <ellipse cx="100" cy="52" rx="45" ry="22" fill="COLOR"/>
+      <path d="M56,64 Q52,75 53,95 Q55,108 60,112 L65,112 Q62,95 63,75 Q60,68 56,64 Z" fill="COLORDARK"/>
+      <path d="M144,64 Q148,75 147,95 Q145,108 140,112 L135,112 Q138,95 137,75 Q140,68 144,64 Z" fill="COLORDARK"/>
+      <path d="M100,45 Q115,40 130,42 Q138,48 138,56" stroke="COLORLIGHT" stroke-width="3" fill="none" stroke-linecap="round"/>
+    `
+  },
+  {
+    id:'loose-bun', name:'Loose Bun', occ:'Arbete',
+    svg:`
+      <path d="M57,65 Q53,42 100,38 Q147,42 143,65 L140,110 Q120,118 100,120 Q80,118 60,110 Z" fill="COLOR"/>
+      <ellipse cx="100" cy="33" rx="28" ry="18" fill="COLOR"/>
+      <ellipse cx="100" cy="30" rx="22" ry="14" fill="COLORDARK"/>
+      <path d="M78,30 Q100,22 122,30" stroke="COLORLIGHT" stroke-width="2" fill="none"/>
+      <path d="M60,110 Q78,128 100,130 Q122,128 140,110" stroke="COLORDARK" stroke-width="2.5" fill="none"/>
+    `
+  },
+  {
+    id:'braids', name:'Braids', occ:'Vardag',
+    svg:`
+      <ellipse cx="100" cy="52" rx="47" ry="24" fill="COLOR"/>
+      <path d="M57,68 L63,68 L65,220 L55,220 Z" fill="COLOR"/>
+      <path d="M143,68 L137,68 L135,220 L145,220 Z" fill="COLOR"/>
+      ${[0,1,2,3,4,5,6,7].map(i=>`
+        <ellipse cx="60" cy="${80+i*18}" rx="5" ry="7" fill="COLORDARK" transform="rotate(${i%2*20-10} 60 ${80+i*18})"/>
+        <ellipse cx="140" cy="${80+i*18}" rx="5" ry="7" fill="COLORDARK" transform="rotate(${i%2*-20+10} 140 ${80+i*18})"/>
+      `).join('')}
+    `
+  },
+  {
+    id:'curtain-bangs', name:'Curtain Bangs', occ:'Dejt',
+    svg:`
+      <path d="M56,62 Q51,40 100,36 Q149,40 144,62 L144,190 Q122,198 100,200 Q78,198 56,190 Z" fill="COLOR"/>
+      <path d="M56,62 Q52,85 52,135 Q51,162 56,190 Q62,195 68,192 L66,108 Q63,80 60,62 Z" fill="COLORDARK"/>
+      <path d="M144,62 Q148,85 148,135 Q149,162 144,190 Q138,195 132,192 L134,108 Q137,80 140,62 Z" fill="COLORDARK"/>
+      <path d="M70,62 Q82,75 100,78 Q118,75 130,62" fill="COLORDARK"/>
+      <path d="M70,62 Q65,72 68,82 Q76,86 84,80 Q92,74 100,78" fill="COLOR"/>
+      <path d="M130,62 Q135,72 132,82 Q124,86 116,80 Q108,74 100,78" fill="COLOR"/>
+      <ellipse cx="100" cy="52" rx="46" ry="22" fill="COLOR"/>
+    `
+  },
+  {
+    id:'afro', name:'Afro', occ:'Vardag',
+    svg:`
+      <ellipse cx="100" cy="55" rx="60" ry="45" fill="COLOR"/>
+      ${Array.from({length:20},(_,i)=>{
+        const a=(i/20)*Math.PI*2, r=56+Math.sin(i*3)*5;
+        const x=100+Math.cos(a)*r, y=55+Math.sin(a)*r*0.75;
+        return `<circle cx="${x}" cy="${y}" r="${5+Math.cos(i*2)*2}" fill="COLORDARK"/>`
+      }).join('')}
+      <ellipse cx="100" cy="55" rx="42" ry="32" fill="COLOR" opacity="0.4"/>
+    `
+  },
+  {
+    id:'french-twist', name:'French Twist', occ:'Bröllop',
+    svg:`
+      <path d="M58,68 Q54,44 100,40 Q146,44 142,68 L140,112 Q120,120 100,122 Q80,120 60,112 Z" fill="COLOR"/>
+      <path d="M108,38 Q114,32 118,26 Q122,20 120,14 Q116,10 112,12 Q106,16 104,24 Q102,32 104,40 Z" fill="COLOR"/>
+      <path d="M108,38 L118,60 Q116,75 114,90 Q112,105 110,118" stroke="COLOR" stroke-width="8" fill="none" stroke-linecap="round"/>
+      <path d="M108,38 L102,60 Q104,75 106,90 Q108,105 110,118" stroke="COLORDARK" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M60,112 Q80,130 100,132 Q120,130 140,112" stroke="COLORDARK" stroke-width="2.5" fill="none"/>
+    `
+  },
+  {
+    id:'side-swept', name:'Side-swept', occ:'Fest',
+    svg:`
+      <path d="M58,62 Q54,40 100,36 Q148,40 144,62 L144,185 Q122,192 100,193 Q78,192 58,185 Z" fill="COLOR"/>
+      <path d="M58,62 Q54,80 53,120 Q52,155 58,185 Q64,190 70,187 L68,105 Q65,78 62,62 Z" fill="COLORDARK"/>
+      <path d="M58,62 Q90,50 130,54 Q144,56 144,62" fill="COLOR"/>
+      <path d="M58,62 Q80,44 120,48 Q138,52 144,62" fill="COLORDARK" opacity="0.5"/>
+    `
+  },
+];
+
+// ── STATE ──
+let userImg = null;
+let selectedStyle = null;
+let selectedColorIdx = 1; // Brun default
+let activeOcc = 'Alla';
+
+// ── INIT ──
+function init(){
+  buildColorPills();
+  buildOccPills();
+  buildGallery();
 }
-function filtered(){
-  return STYLES.filter(s=>
-    (activeOcc==='Alla'||s.occ===activeOcc)&&
-    (activeCol==='Alla'||s.colorName===activeCol)
-  );
+
+function buildColorPills(){
+  const c=document.getElementById('colorPills');
+  COLORS.forEach((col,i)=>{
+    const d=document.createElement('div');
+    d.className='cpill'+(i===selectedColorIdx?' active':'');
+    d.style.background=col.hex;
+    d.title=col.name;
+    d.onclick=()=>{selectedColorIdx=i;document.querySelectorAll('.cpill').forEach(p=>p.classList.remove('active'));d.classList.add('active');if(selectedStyle)applyHair(selectedStyle);notif('Hårfärg: '+col.name)};
+    const lbl=document.createElement('span');
+    lbl.className='cpill-label';
+    lbl.textContent=col.name;
+    d.appendChild(lbl);
+    c.appendChild(d);
+  });
 }
 
-// ── UPLOAD STATE ──
-let uploadedImg=null;  // HTMLImageElement
-let selectedStyle=null;
+function buildOccPills(){
+  const c=document.getElementById('occPills');
+  OCCASIONS.forEach(occ=>{
+    const b=document.createElement('button');
+    b.className='pill'+(occ==='Alla'?' active':'');
+    b.textContent=occ;
+    b.onclick=()=>{activeOcc=occ;document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));b.classList.add('active');buildGallery()};
+    c.appendChild(b);
+  });
+}
 
-function onFileChange(file){if(file)loadFile(file)}
-function onDragOver(e){e.preventDefault();document.getElementById('uploadArea').classList.add('drag-over')}
-function onDragLeave(){document.getElementById('uploadArea').classList.remove('drag-over')}
-function onDrop(e){e.preventDefault();document.getElementById('uploadArea').classList.remove('drag-over');if(e.dataTransfer.files[0])loadFile(e.dataTransfer.files[0])}
+function buildGallery(){
+  const g=document.getElementById('hairGallery');
+  g.innerHTML='';
+  const list=STYLES.filter(s=>activeOcc==='Alla'||s.occ===activeOcc);
+  document.getElementById('galleryCount').textContent=list.length+' frisyrer';
+  list.forEach(style=>{
+    const card=document.createElement('div');
+    card.className='hcard'+(selectedStyle&&selectedStyle.id===style.id?' selected':'');
 
-function loadFile(file){
-  if(!file.type.startsWith('image/')){notif('⚠ Välj en giltig bildfil');return}
+    // Preview — render SVG thumbnail
+    const prev=document.createElement('div');
+    prev.className='hcard-preview';
+    const svgEl=makeSVG(style,COLORS[selectedColorIdx]);
+    svgEl.setAttribute('viewBox','0 0 200 160');
+    svgEl.style.cssText='position:absolute;top:0;left:0;width:100%;height:100%';
+    prev.style.position='relative';
+    prev.appendChild(svgEl);
+    card.appendChild(prev);
+
+    const badge=document.createElement('div');
+    badge.className='sel-badge';
+    badge.textContent='✓ Vald';
+    card.appendChild(badge);
+
+    const nm=document.createElement('div');
+    nm.className='hcard-name';
+    nm.textContent=style.name;
+    card.appendChild(nm);
+
+    const sub=document.createElement('div');
+    sub.className='hcard-sub';
+    sub.textContent=style.occ;
+    card.appendChild(sub);
+
+    card.onclick=()=>selectStyle(style,card);
+    g.appendChild(card);
+  });
+}
+
+function makeSVG(style,color){
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('viewBox','0 0 200 220');
+  const dark=darken(color.hex,.65);
+  const light=lighten(color.hex,1.3);
+  const html=style.svg
+    .replaceAll('COLOR',color.hex)
+    .replaceAll('COLORDARK',dark)
+    .replaceAll('COLORLIGHT',light);
+  svg.innerHTML=html;
+  return svg;
+}
+
+// ── PHOTO UPLOAD ──
+function dzOver(e){e.preventDefault();document.getElementById('uploadZone').classList.add('over')}
+function dzLeave(){document.getElementById('uploadZone').classList.remove('over')}
+function dzDrop(e){e.preventDefault();dzLeave();if(e.dataTransfer.files[0])loadPhoto(e.dataTransfer.files[0])}
+
+function loadPhoto(file){
+  if(!file||!file.type.startsWith('image/')){notif('⚠ Välj en bildfil');return}
+  setStatus('loading','Laddar bild…');
   const reader=new FileReader();
   reader.onload=ev=>{
     const img=new Image();
     img.onload=()=>{
-      uploadedImg=img;
-      document.getElementById('thumbImg').src=ev.target.result;
-      document.getElementById('thumbName').textContent=file.name;
-      document.getElementById('origImg').src=ev.target.result;
-      document.getElementById('uploadPanel').style.display='none';
-      document.getElementById('galleryPanel').style.display='block';
-      renderGallery();
-      notif('✓ Foto uppladdat! Välj en frisyr nedan.');
+      userImg=img;
+      document.getElementById('uploadZone').style.display='none';
+      const pp=document.getElementById('photoPreview');
+      pp.style.display='block';
+      document.getElementById('userPhoto').src=ev.target.result;
+      document.getElementById('changeBtn').style.display='block';
+      document.getElementById('colorControls').style.display='block';
+      document.getElementById('occControls').style.display='block';
+      document.getElementById('galleryInfo').textContent='Välj en frisyr att prova';
+      setStatus('ready','Redo — välj en frisyr i galleriet');
+      buildGallery();
+      notif('✓ Foto laddat! Klicka på en frisyr nedan.');
     };
     img.src=ev.target.result;
   };
   reader.readAsDataURL(file);
 }
 
-function resetUpload(){
-  uploadedImg=null; selectedStyle=null;
-  document.getElementById('fileInput').value='';
-  document.getElementById('uploadPanel').style.display='block';
-  document.getElementById('galleryPanel').style.display='none';
-  document.getElementById('resultPanel').style.display='none';
+function resetPhoto(){
+  userImg=null; selectedStyle=null;
+  document.getElementById('fileIn').value='';
+  document.getElementById('uploadZone').style.display='flex';
+  document.getElementById('photoPreview').style.display='none';
+  document.getElementById('changeBtn').style.display='none';
+  document.getElementById('colorControls').style.display='none';
+  document.getElementById('occControls').style.display='none';
+  document.getElementById('resultArea').classList.remove('visible');
+  document.getElementById('galleryInfo').textContent='Välj en frisyr att prova';
+  // clear canvas
+  const cv=document.getElementById('hairCanvas');
+  cv.getContext('2d').clearRect(0,0,cv.width,cv.height);
+  setStatus('idle','Ladda upp ett foto för att börja');
+  buildGallery();
   notif('Foto borttaget');
 }
 
-// ── GALLERY RENDER ──
-function renderGallery(){
-  const list=filtered();
-  const grid=document.getElementById('galleryGrid');
-  document.getElementById('galleryCount').textContent=`Visar ${list.length} frisyrer — klicka för att prova`;
-  grid.innerHTML='';
-  if(list.length===0){grid.innerHTML='<div style="grid-column:1/-1;color:var(--muted);font-size:.85rem;padding:20px 0;">Inga frisyrer matchar filtret. Prova att ändra tillfälle eller färg.</div>';return}
-  list.forEach(style=>{
-    const card=document.createElement('div');
-    card.className='gallery-card'+(selectedStyle&&selectedStyle.id===style.id?' selected':'');
-    card.innerHTML=`<div class="selected-badge">✓ Vald</div>`;
-    // preview canvas
-    const cv=document.createElement('canvas');
-    cv.width=148; cv.height=197;
-    drawHairPreview(cv,style,uploadedImg);
-    card.appendChild(cv);
-    const lbl=document.createElement('div');
-    lbl.className='gallery-card-label';
-    lbl.innerHTML=`${style.name}<br><span class="gallery-card-sub">${style.colorName} · ${style.occ}</span>`;
-    card.appendChild(lbl);
-    card.onclick=()=>selectStyle(style);
-    grid.appendChild(card);
-  });
-}
-
-// ── DRAW HAIR PREVIEW ──
-// Draws the user's photo with a stylized hair overlay on top
-function drawHairPreview(canvas, style, img){
-  const ctx=canvas.getContext('2d');
-  const W=canvas.width, H=canvas.height;
-  ctx.clearRect(0,0,W,H);
-  // Draw photo scaled to fill canvas
-  if(img){
-    const scale=Math.max(W/img.width, H/img.height);
-    const sw=img.width*scale, sh=img.height*scale;
-    const sx=(W-sw)/2, sy=(H-sh)/2;
-    ctx.drawImage(img,sx,sy,sw,sh);
-  } else {
-    // placeholder face
-    ctx.fillStyle='#2A2218';
-    ctx.fillRect(0,0,W,H);
-    ctx.fillStyle='#5A4A3A';
-    ctx.beginPath(); ctx.arc(W/2,H*0.52,W*0.28,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle='#3D3028';
-    ctx.fillRect(W*0.3,H*0.6,W*0.4,H*0.4);
-  }
-  // Draw hair shape on top
-  drawHairShape(ctx,W,H,style);
-  // Tint overlay for realism
-  ctx.globalAlpha=0.12;
-  ctx.fillStyle=style.color;
-  ctx.fillRect(0,0,W,H*0.5);
-  ctx.globalAlpha=1;
-}
-
-function drawHairShape(ctx,W,H,style){
-  const c=style.color;
-  const shape=style.shape;
-  ctx.save();
-  if(shape==='long-straight'||shape==='long-wavy'){
-    // Long hair down the sides and top
-    ctx.fillStyle=c;
-    // Top / crown
-    ctx.beginPath();
-    ctx.ellipse(W/2,-H*0.02,W*0.46,H*0.22,0,0,Math.PI*2);
-    ctx.fill();
-    // Left side
-    ctx.beginPath();
-    ctx.moveTo(W*0.04,H*0.1);
-    if(shape==='long-wavy'){
-      ctx.bezierCurveTo(W*-0.1,H*0.35, W*0.12,H*0.6, W*0.06,H*0.95);
-      ctx.bezierCurveTo(W*0.18,H*0.95, W*0.32,H*0.7, W*0.28,H*0.5);
-      ctx.bezierCurveTo(W*0.24,H*0.35, W*0.1,H*0.25, W*0.04,H*0.1);
-    } else {
-      ctx.lineTo(W*0.04,H*0.92); ctx.lineTo(W*0.28,H*0.92); ctx.lineTo(W*0.28,H*0.1);
-    }
-    ctx.fill();
-    // Right side
-    ctx.beginPath();
-    ctx.moveTo(W*0.96,H*0.1);
-    if(shape==='long-wavy'){
-      ctx.bezierCurveTo(W*1.1,H*0.35, W*0.88,H*0.6, W*0.94,H*0.95);
-      ctx.bezierCurveTo(W*0.82,H*0.95, W*0.68,H*0.7, W*0.72,H*0.5);
-      ctx.bezierCurveTo(W*0.76,H*0.35, W*0.9,H*0.25, W*0.96,H*0.1);
-    } else {
-      ctx.lineTo(W*0.96,H*0.92); ctx.lineTo(W*0.72,H*0.92); ctx.lineTo(W*0.72,H*0.1);
-    }
-    ctx.fill();
-
-  } else if(shape==='bob'||shape==='lob'){
-    const botY=shape==='bob'?H*0.55:H*0.68;
-    ctx.fillStyle=c;
-    ctx.beginPath();
-    ctx.ellipse(W/2,-H*0.02,W*0.46,H*0.22,0,0,Math.PI*2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(W*0.05,H*0.12);
-    ctx.bezierCurveTo(W*-0.05,H*0.35,W*0.06,botY,W*0.12,botY);
-    ctx.lineTo(W*0.88,botY);
-    ctx.bezierCurveTo(W*0.94,botY,W*1.05,H*0.35,W*0.95,H*0.12);
-    ctx.fill();
-
-  } else if(shape==='pixie'||shape==='undercut'){
-    ctx.fillStyle=c;
-    ctx.beginPath();
-    ctx.ellipse(W/2,H*0.06,W*0.44,H*0.17,0,0,Math.PI*2);
-    ctx.fill();
-    if(shape==='undercut'){
-      // shaved sides
-      ctx.fillStyle=hexDarken(c,0.6);
-      ctx.beginPath(); ctx.rect(0,H*0.15,W*0.16,H*0.25); ctx.fill();
-      ctx.beginPath(); ctx.rect(W*0.84,H*0.15,W*0.16,H*0.25); ctx.fill();
-    } else {
-      ctx.beginPath();
-      ctx.moveTo(W*0.05,H*0.12); ctx.lineTo(W*0.05,H*0.38);
-      ctx.lineTo(W*0.28,H*0.4); ctx.lineTo(W*0.28,H*0.12); ctx.fill();
-      ctx.beginPath();
-      ctx.moveTo(W*0.95,H*0.12); ctx.lineTo(W*0.95,H*0.38);
-      ctx.lineTo(W*0.72,H*0.4); ctx.lineTo(W*0.72,H*0.12); ctx.fill();
-    }
-
-  } else if(shape==='bun'){
-    ctx.fillStyle=c;
-    // Sides pulled back
-    ctx.beginPath();
-    ctx.moveTo(W*0.05,H*0.1); ctx.lineTo(W*0.05,H*0.48);
-    ctx.lineTo(W*0.24,H*0.52); ctx.lineTo(W*0.28,H*0.1); ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(W*0.95,H*0.1); ctx.lineTo(W*0.95,H*0.48);
-    ctx.lineTo(W*0.76,H*0.52); ctx.lineTo(W*0.72,H*0.1); ctx.fill();
-    // Bun on top
-    ctx.beginPath();
-    ctx.ellipse(W/2,H*0.03,W*0.22,H*0.1,0,0,Math.PI*2); ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(W/2,-H*0.04,W*0.4,H*0.18,0,0,Math.PI*2); ctx.fill();
-
-  } else if(shape==='braids'){
-    ctx.fillStyle=c;
-    ctx.beginPath(); ctx.ellipse(W/2,H*0,W*0.44,H*0.18,0,0,Math.PI*2); ctx.fill();
-    // Left braid
-    for(let i=0;i<6;i++){
-      const y=H*0.2+i*H*0.13;
-      const w2=W*0.06*(1-i*0.04);
-      ctx.beginPath();
-      ctx.ellipse(W*0.2,y,w2,H*0.045,0,0,Math.PI*2);
-      ctx.fill();
-    }
-    // Right braid
-    for(let i=0;i<6;i++){
-      const y=H*0.2+i*H*0.13;
-      const w2=W*0.06*(1-i*0.04);
-      ctx.beginPath();
-      ctx.ellipse(W*0.8,y,w2,H*0.045,0,0,Math.PI*2);
-      ctx.fill();
-    }
-
-  } else if(shape==='updo'){
-    ctx.fillStyle=c;
-    ctx.beginPath(); ctx.ellipse(W/2,H*0.0,W*0.42,H*0.18,0,0,Math.PI*2); ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(W*0.08,H*0.12); ctx.lineTo(W*0.08,H*0.42);
-    ctx.lineTo(W*0.26,H*0.44); ctx.lineTo(W*0.26,H*0.12); ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(W*0.92,H*0.12); ctx.lineTo(W*0.92,H*0.42);
-    ctx.lineTo(W*0.74,H*0.44); ctx.lineTo(W*0.74,H*0.12); ctx.fill();
-    // twist
-    ctx.beginPath(); ctx.ellipse(W/2,H*0.07,W*0.18,H*0.09,-0.3,0,Math.PI*2); ctx.fill();
-
-  } else if(shape==='bangs'){
-    // Bangs with medium length
-    ctx.fillStyle=c;
-    ctx.beginPath(); ctx.ellipse(W/2,H*0.0,W*0.46,H*0.2,0,0,Math.PI*2); ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(W*0.06,H*0.12); ctx.lineTo(W*0.06,H*0.7);
-    ctx.lineTo(W*0.28,H*0.72); ctx.lineTo(W*0.28,H*0.12); ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(W*0.94,H*0.12); ctx.lineTo(W*0.94,H*0.7);
-    ctx.lineTo(W*0.72,H*0.72); ctx.lineTo(W*0.72,H*0.12); ctx.fill();
-    // curtain bangs over forehead
-    ctx.fillStyle=hexDarken(c,0.85);
-    ctx.beginPath();
-    ctx.moveTo(W*0.22,H*0.18);
-    ctx.bezierCurveTo(W*0.28,H*0.28,W*0.44,H*0.32,W/2,H*0.26);
-    ctx.bezierCurveTo(W*0.56,H*0.32,W*0.72,H*0.28,W*0.78,H*0.18);
-    ctx.bezierCurveTo(W*0.7,H*0.1,W*0.3,H*0.1,W*0.22,H*0.18);
-    ctx.fill();
-
-  } else if(shape==='afro'||shape==='curly'){
-    ctx.fillStyle=c;
-    const r=shape==='afro'?W*0.48:W*0.42;
-    ctx.beginPath(); ctx.arc(W/2,H*0.12,r,0,Math.PI*2); ctx.fill();
-    // Textured bumps
-    const bumps=shape==='afro'?16:10;
-    for(let i=0;i<bumps;i++){
-      const angle=(i/bumps)*Math.PI*2;
-      const br=r*(shape==='afro'?0.92:0.88);
-      ctx.beginPath();
-      ctx.arc(W/2+Math.cos(angle)*br,H*0.12+Math.sin(angle)*br*0.6,W*0.06,0,Math.PI*2);
-      ctx.fill();
-    }
-  }
-  ctx.restore();
-}
-
-function hexDarken(hex,factor){
-  let r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
-  return `rgb(${Math.round(r*factor)},${Math.round(g*factor)},${Math.round(b*factor)})`;
-}
-
-// ── SELECT STYLE ──
-function selectStyle(style){
+// ── SELECT & APPLY ──
+function selectStyle(style,card){
   selectedStyle=style;
-  // update gallery highlights
-  document.querySelectorAll('.gallery-card').forEach(c=>{
-    c.classList.remove('selected');
-    if(c.querySelector('.gallery-card-label')&&c.querySelector('.gallery-card-label').textContent.includes(style.name)&&c.querySelector('.gallery-card-sub')&&c.querySelector('.gallery-card-sub').textContent.includes(style.colorName)&&c.querySelector('.gallery-card-sub').textContent.includes(style.occ)){
-      c.classList.add('selected');
-    }
-  });
-  // render full result
-  renderResult(style);
-  document.getElementById('resultPanel').style.display='block';
-  setTimeout(()=>document.getElementById('resultPanel').scrollIntoView({behavior:'smooth',block:'nearest'}),100);
-  notif(`✓ Valde: ${style.name} · ${style.colorName}`);
+  document.querySelectorAll('.hcard').forEach(c=>c.classList.remove('selected'));
+  card.classList.add('selected');
+  setStatus('loading','Applicerar frisyr…');
+  setTimeout(()=>applyHair(style),50);
 }
 
-function renderResult(style){
-  const canvas=document.getElementById('resultCanvas');
-  canvas.width=480; canvas.height=640;
-  document.getElementById('resultTitle').textContent=style.name;
-  document.getElementById('resultSub').textContent=`${style.colorName} · ${style.occ}`;
-  drawHairPreview(canvas,style,uploadedImg);
+function applyHair(style){
+  if(!userImg){return}
+  const photo=document.getElementById('userPhoto');
+  const container=document.getElementById('photoPreview');
+  const cv=document.getElementById('hairCanvas');
+
+  // Size canvas to match displayed photo
+  const rect=photo.getBoundingClientRect();
+  const dispW=photo.offsetWidth||300;
+  const dispH=photo.offsetHeight||400;
+  cv.width=dispW;
+  cv.height=dispH;
+  cv.style.width=dispW+'px';
+  cv.style.height=dispH+'px';
+
+  const ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,dispW,dispH);
+
+  // Build SVG and render as image overlay
+  const color=COLORS[selectedColorIdx];
+  const svgEl=makeSVG(style,color);
+  svgEl.setAttribute('viewBox','0 0 200 220');
+  svgEl.setAttribute('width','200');
+  svgEl.setAttribute('height','220');
+
+  const svgStr=new XMLSerializer().serializeToString(svgEl);
+  const blob=new Blob([svgStr],{type:'image/svg+xml'});
+  const url=URL.createObjectURL(blob);
+  const svgImg=new Image();
+  svgImg.onload=()=>{
+    // The hair SVG covers the top ~60% of the photo (head area)
+    // Scale to photo width, position at top
+    const hairW=dispW*1.05;
+    const hairH=hairW*(220/200);
+    const hairX=(dispW-hairW)/2;
+    // Position so hair sits at top of photo, offset slightly up
+    const hairY=-dispH*0.05;
+
+    ctx.globalCompositeOperation='source-over';
+    ctx.globalAlpha=0.92;
+    ctx.drawImage(svgImg,hairX,hairY,hairW,hairH);
+    ctx.globalAlpha=1;
+    URL.revokeObjectURL(url);
+
+    // Update result bar
+    document.getElementById('resName').textContent=style.name;
+    document.getElementById('resSub').textContent=color.name+' · '+style.occ;
+    document.getElementById('resultArea').classList.add('visible');
+    setStatus('ready','Frisyr applicerad — '+style.name+' · '+color.name);
+    notif('✓ '+style.name+' i '+color.name+' applicerad!');
+  };
+  svgImg.src=url;
 }
 
 // ── DOWNLOAD ──
 function downloadResult(){
-  if(!selectedStyle){notif('⚠ Välj en frisyr först');return}
-  const cv=document.getElementById('resultCanvas');
-  const a=document.createElement('a');
-  a.href=cv.toDataURL('image/jpeg',0.92);
-  a.download=`frisyr-${selectedStyle.name.toLowerCase().replace(/\s/g,'-')}.jpg`;
-  a.click();
-  notif('⬇ Bild nedladdad!');
+  if(!userImg||!selectedStyle){notif('⚠ Välj ett foto och en frisyr');return}
+  // Composite photo + hair overlay onto a new canvas
+  const photo=document.getElementById('userPhoto');
+  const cv2=document.createElement('canvas');
+  cv2.width=userImg.width; cv2.height=userImg.height;
+  const ctx2=cv2.getContext('2d');
+  ctx2.drawImage(userImg,0,0);
+  // Draw hair at correct scale
+  const color=COLORS[selectedColorIdx];
+  const svgEl=makeSVG(selectedStyle,color);
+  svgEl.setAttribute('viewBox','0 0 200 220');
+  svgEl.setAttribute('width','200');
+  svgEl.setAttribute('height','220');
+  const svgStr=new XMLSerializer().serializeToString(svgEl);
+  const blob=new Blob([svgStr],{type:'image/svg+xml'});
+  const url=URL.createObjectURL(blob);
+  const svgImg=new Image();
+  svgImg.onload=()=>{
+    const hairW=userImg.width*1.05;
+    const hairH=hairW*(220/200);
+    const hairX=(userImg.width-hairW)/2;
+    const hairY=-userImg.height*0.05;
+    ctx2.globalAlpha=0.92;
+    ctx2.drawImage(svgImg,hairX,hairY,hairW,hairH);
+    ctx2.globalAlpha=1;
+    URL.revokeObjectURL(url);
+    const a=document.createElement('a');
+    a.href=cv2.toDataURL('image/jpeg',.92);
+    a.download='frisyr-'+selectedStyle.id+'.jpg';
+    a.click();
+    notif('⬇ Bild sparad!');
+  };
+  svgImg.src=url;
 }
+
 function doShare(){
-  if(navigator.share){navigator.share({title:'Min nya frisyr',text:`Kollade ut med ${selectedStyle?.name||'ny frisyr'}!`}).catch(()=>{})}
-  else{navigator.clipboard?.writeText(window.location.href).then(()=>notif('🔗 Länk kopierad!')).catch(()=>notif('Kopiera URL manuellt'))}
+  if(navigator.share){navigator.share({title:'Min nya frisyr',text:'Kollade ut med '+selectedStyle?.name+'!'}).catch(()=>{})}
+  else{navigator.clipboard?.writeText(location.href).then(()=>notif('🔗 Länk kopierad!')).catch(()=>notif('Kopiera URL manuellt'))}
 }
+
+// ── STATUS ──
+function setStatus(type,msg){
+  document.getElementById('statusText').textContent=msg;
+  const dot=document.getElementById('statusDot');
+  dot.className='status-dot'+(type==='loading'?' loading':'');
+}
+
+// ── COLOR HELPERS ──
+function darken(hex,f){
+  let r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return `rgb(${Math.round(r*f)},${Math.round(g*f)},${Math.round(b*f)})`;
+}
+function lighten(hex,f){
+  let r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return `rgb(${Math.min(255,Math.round(r*f))},${Math.min(255,Math.round(g*f))},${Math.min(255,Math.round(b*f))})`;
+}
+
+init();
 </script>
 </body>
 </html>
