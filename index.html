@@ -1,690 +1,175 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>RecruitFlow AI — Verktygsanalys</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#08090D;--surface:#0F1118;--card:#161923;
-  --border:rgba(100,160,255,0.12);--blue:#4A8FE8;--bl:#7AB3FF;
-  --text:#EDF0F7;--muted:#6B7694;--accent:#E85A4A;--green:#4ACF8A;
-  --gold:#C9A96E;
-}
-html{scroll-behavior:smooth}
-body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
-
-/* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;align-items:center;justify-content:space-between;padding:16px 52px;background:rgba(8,9,13,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
-.nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;color:var(--blue);letter-spacing:.02em}
-.nav-logo span{color:var(--bl)}
-.nav-links{display:flex;gap:28px;list-style:none}
-.nav-links a{text-decoration:none;color:var(--muted);font-size:.74rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;transition:color .2s;cursor:pointer}
-.nav-links a:hover{color:var(--bl)}
-.hbg{display:none;background:none;border:none;color:var(--blue);font-size:1.4rem;cursor:pointer}
-
-/* HERO */
-.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:140px 48px 80px;position:relative;overflow:hidden}
-.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(74,143,232,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(74,143,232,.04) 1px,transparent 1px);background-size:60px 60px;pointer-events:none}
-.hero-glow{position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(74,143,232,.08) 0%,transparent 65%);border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
-.hero-tag{display:inline-flex;align-items:center;gap:10px;font-size:.71rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--blue);background:rgba(74,143,232,.08);border:1px solid rgba(74,143,232,.2);padding:8px 20px;border-radius:40px;margin-bottom:32px;animation:fd .8s ease both}
-@keyframes fd{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
-.hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,7vw,6.5rem);font-weight:300;line-height:1;letter-spacing:-.02em;margin-bottom:14px;animation:fd .9s .1s ease both}
-.hero h1 em{font-style:italic;color:var(--bl)}
-.hero h1 strong{font-weight:600;color:var(--text)}
-.hero-sub{font-family:'Cormorant Garamond',serif;font-size:clamp(1rem,2vw,1.6rem);font-style:italic;color:var(--muted);margin-bottom:28px;animation:fd 1s .2s ease both}
-.hero-desc{max-width:560px;font-size:.96rem;line-height:1.8;color:var(--muted);margin-bottom:44px;animation:fd 1s .3s ease both}
-.hero-chips{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;animation:fd 1s .4s ease both;margin-bottom:40px}
-.chip{font-size:.74rem;padding:7px 16px;border-radius:2px;border:1px solid var(--border);color:var(--muted)}
-.chip.blue{border-color:rgba(74,143,232,.35);color:var(--blue)}
-.chip.green{border-color:rgba(74,207,138,.25);color:var(--green)}
-.hero-stats{display:flex;gap:40px;flex-wrap:wrap;justify-content:center;animation:fd 1s .5s ease both}
-.hstat{text-align:center}
-.hstat .n{font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:300;color:var(--bl);line-height:1}
-.hstat .l{font-size:.72rem;color:var(--muted);margin-top:4px;letter-spacing:.06em;text-transform:uppercase}
-.scroll-hint{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;animation:bounce 2.5s ease-in-out infinite}
-@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(7px)}}
-.scroll-line{width:1px;height:38px;background:linear-gradient(to bottom,var(--blue),transparent)}
-
-/* LAYOUT */
-section{padding:90px 56px;max-width:1100px;margin:0 auto}
-.divider{border:none;border-top:1px solid var(--border);margin:0 56px}
-.slbl{display:flex;align-items:center;gap:14px;font-size:.67rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--blue);margin-bottom:20px}
-.slbl::after{content:'';flex:1;height:1px;background:var(--border)}
-h2{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4vw,3.2rem);font-weight:300;line-height:1.1;margin-bottom:16px}
-h2 em{font-style:italic;color:var(--bl)}
-.lead{font-size:.97rem;line-height:1.8;color:var(--muted);max-width:680px;margin-bottom:44px}
-
-/* ABOUT GRID */
-.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--border);border:1px solid var(--border)}
-.about-cell{background:var(--card);padding:36px}
-.about-cell .icon{font-size:1.8rem;margin-bottom:14px}
-.about-cell h3{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;color:var(--bl);margin-bottom:10px}
-.about-cell p{font-size:.87rem;line-height:1.75;color:var(--muted)}
-.about-cell strong{color:var(--text)}
-
-/* HOW IT WORKS */
-.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border);border:1px solid var(--border);margin-top:44px}
-.how-cell{background:var(--card);padding:36px 28px;position:relative;transition:background .25s}
-.how-cell:hover{background:var(--surface)}
-.how-num{font-family:'Cormorant Garamond',serif;font-size:3.5rem;font-weight:300;color:rgba(74,143,232,.12);line-height:1;margin-bottom:16px}
-.how-icon{position:absolute;top:24px;right:24px;font-size:1.4rem}
-.how-cell h4{font-size:.9rem;font-weight:600;margin-bottom:10px;color:var(--text)}
-.how-cell p{font-size:.82rem;line-height:1.7;color:var(--muted)}
-
-/* FEATURES */
-.feat-big{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:44px}
-.feat-card{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:32px;transition:border-color .25s,transform .25s}
-.feat-card:hover{border-color:rgba(74,143,232,.3);transform:translateY(-3px)}
-.feat-card .fc-icon{font-size:2rem;margin-bottom:16px}
-.feat-card h3{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;color:var(--bl);margin-bottom:12px}
-.feat-card p{font-size:.85rem;line-height:1.75;color:var(--muted);margin-bottom:16px}
-.feat-tags{display:flex;flex-wrap:wrap;gap:7px}
-.ftag{font-size:.7rem;padding:4px 10px;border-radius:2px;background:rgba(74,143,232,.08);border:1px solid rgba(74,143,232,.15);color:var(--blue)}
-.ftag.green{background:rgba(74,207,138,.08);border-color:rgba(74,207,138,.15);color:var(--green)}
-
-/* INTEGRATIONS */
-.integ-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:44px}
-.integ-card{flex:1;min-width:200px;background:var(--card);border:1px solid var(--border);border-radius:3px;padding:28px 24px;text-align:center;transition:border-color .25s,transform .25s}
-.integ-card:hover{border-color:rgba(74,143,232,.3);transform:translateY(-3px)}
-.integ-card .ii{font-size:2.2rem;margin-bottom:12px}
-.integ-card h4{font-size:.9rem;font-weight:600;margin-bottom:6px}
-.integ-card p{font-size:.8rem;color:var(--muted);line-height:1.65}
-
-/* TARGET */
-.target-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:44px}
-.tcard{background:var(--card);border:1px solid var(--border);padding:26px 22px;border-radius:3px;transition:border-color .25s,transform .25s}
-.tcard:hover{border-color:rgba(74,143,232,.3);transform:translateY(-4px)}
-.tcard .te{font-size:1.9rem;margin-bottom:12px}
-.tcard h4{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;color:var(--bl);margin-bottom:8px}
-.tcard p{font-size:.82rem;line-height:1.7;color:var(--muted)}
-
-/* LIMITATIONS TABLE */
-.ltbl{width:100%;border-collapse:collapse;margin-top:44px}
-.ltbl th{text-align:left;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);padding:12px 18px;border-bottom:1px solid var(--border);background:var(--surface)}
-.ltbl td{padding:14px 18px;font-size:.83rem;line-height:1.6;color:var(--muted);border-bottom:1px solid rgba(74,143,232,.06);vertical-align:top}
-.ltbl tr:hover td{background:var(--card)}
-.badge{display:inline-block;font-size:.66rem;font-weight:600;padding:3px 9px;border-radius:2px;white-space:nowrap}
-.bw{background:rgba(232,90,74,.15);color:var(--accent);border:1px solid rgba(232,90,74,.25)}
-.bo{background:rgba(74,207,138,.1);color:var(--green);border:1px solid rgba(74,207,138,.2)}
-.bi{background:rgba(74,143,232,.1);color:var(--blue);border:1px solid rgba(74,143,232,.2)}
-.by{background:rgba(201,169,110,.1);color:var(--gold);border:1px solid rgba(201,169,110,.2)}
-
-/* PROCESS / DEMO */
-.demo-wrap{background:var(--card);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-top:44px}
-.demo-bar{background:var(--surface);padding:10px 18px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
-.dbd{width:10px;height:10px;border-radius:50%}
-.durl{flex:1;background:var(--card);border-radius:4px;padding:4px 14px;font-size:.72rem;color:var(--muted);text-align:center}
-
-.demo-inner{display:grid;grid-template-columns:1fr 1fr;min-height:420px}
-.demo-left{border-right:1px solid var(--border);padding:32px;display:flex;flex-direction:column;gap:20px}
-.demo-right{padding:32px;display:flex;flex-direction:column;gap:20px}
-
-.demo-label{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:8px;font-weight:600}
-.cv-before{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:20px;font-size:.75rem;line-height:1.8;color:var(--muted);position:relative;flex:1}
-.cv-before .cb-badge{position:absolute;top:10px;right:10px;background:rgba(232,90,74,.15);color:var(--accent);font-size:.62rem;padding:3px 8px;border-radius:2px;font-weight:600}
-.cv-after{background:var(--surface);border:1px solid rgba(74,207,138,.2);border-radius:3px;padding:20px;font-size:.75rem;line-height:1.8;color:var(--muted);position:relative;flex:1}
-.cv-after .ca-badge{position:absolute;top:10px;right:10px;background:rgba(74,207,138,.12);color:var(--green);font-size:.62rem;padding:3px 8px;border-radius:2px;font-weight:600}
-.removed{text-decoration:line-through;color:rgba(232,90,74,.5)}
-.highlight{color:var(--green)}
-.cv-name{font-weight:600;color:var(--text);font-size:.82rem}
-.cv-section{margin-top:10px;border-top:1px solid var(--border);padding-top:10px}
-.cv-section-title{color:var(--blue);font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
-.anon-box{background:rgba(74,143,232,.06);border:1px dashed rgba(74,143,232,.2);padding:3px 8px;border-radius:2px;color:var(--blue);font-size:.71rem}
-
-.process-btn{background:var(--blue);color:white;border:none;padding:12px 28px;font-size:.84rem;font-weight:600;font-family:'Outfit',sans-serif;border-radius:3px;cursor:pointer;transition:all .2s;align-self:center;letter-spacing:.04em}
-.process-btn:hover{background:var(--bl);transform:translateY(-1px)}
-.arrow-center{text-align:center;font-size:1.8rem;color:var(--blue);align-self:center}
-
-/* PROCESS TIMELINE */
-.ptl{margin-top:44px;display:flex;flex-direction:column}
-.ps{display:grid;grid-template-columns:72px 1fr;gap:24px;padding:32px 0;border-bottom:1px solid var(--border)}
-.ps:last-child{border-bottom:none}
-.pn{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:300;color:var(--blue);line-height:1}
-.pc h4{font-size:.94rem;font-weight:600;margin-bottom:8px}
-.pc p{font-size:.84rem;line-height:1.75;color:var(--muted);margin-bottom:10px}
-.ibox{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:14px 18px;font-size:.8rem;color:var(--muted);line-height:1.7}
-.tcs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
-.tc{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:12px;text-align:center}
-.tc .ti{font-size:1.2rem;margin-bottom:4px}
-.tc .tl{font-size:.66rem;color:var(--blue);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
-.tc .td{font-size:.74rem;color:var(--muted);line-height:1.5}
-.tc .tr2{margin-top:6px;font-size:.66rem;padding:3px 7px;border-radius:2px}
-.ok{background:rgba(74,207,138,.1);color:var(--green)}
-.wa{background:rgba(232,90,74,.1);color:var(--accent)}
-
-/* EVAL */
-.evg{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:44px}
-.evc{background:var(--card);border:1px solid var(--border);padding:26px;border-radius:3px}
-.evc.pos{border-top:3px solid var(--green)}
-.evc.neg{border-top:3px solid var(--accent)}
-.evc h4{font-size:.77rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px}
-.evc.pos h4{color:var(--green)}
-.evc.neg h4{color:var(--accent)}
-.evl{list-style:none;display:flex;flex-direction:column;gap:9px}
-.evl li{display:flex;gap:9px;font-size:.82rem;line-height:1.6;color:var(--muted)}
-.evl li::before{content:'→';color:var(--blue);flex-shrink:0;font-size:.76rem;margin-top:2px}
-
-/* RATINGS */
-.rtg-bar{display:flex;flex-direction:column;gap:13px;margin-top:44px}
-.rtg-row{display:grid;grid-template-columns:185px 1fr 40px;align-items:center;gap:13px}
-.rtg-lbl{font-size:.79rem;color:var(--muted)}
-.rtg-trk{height:4px;background:var(--surface);border-radius:2px;overflow:hidden}
-.rtg-fill{height:100%;background:linear-gradient(to right,var(--blue),var(--bl));border-radius:2px}
-.rtg-sc{font-size:.79rem;font-weight:600;color:var(--blue);text-align:right}
-
-.concl{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--blue);padding:34px;margin-top:44px;border-radius:0 3px 3px 0}
-.concl .cl{font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:12px}
-.concl p:first-of-type{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:300;line-height:1.5;margin-bottom:12px}
-.concl p:last-of-type{font-size:.86rem;line-height:1.8;color:var(--muted)}
-
-footer{padding:52px 56px 36px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:20px}
-.ftl{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;color:var(--blue)}
-.ftl span{color:var(--bl)}
-footer .fp{font-size:.74rem;color:var(--muted);line-height:1.75;max-width:380px;margin-top:8px}
-.ftr{text-align:right;font-size:.72rem;color:var(--muted);line-height:1.85}
-
-.reveal{opacity:0;transform:translateY(22px);transition:opacity .65s ease,transform .65s ease}
-.reveal.visible{opacity:1;transform:translateY(0)}
-.notif{position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--blue);color:var(--text);padding:11px 18px;border-radius:4px;font-size:.81rem;z-index:999;transform:translateY(70px);opacity:0;transition:all .3s ease;pointer-events:none}
-.notif.show{transform:translateY(0);opacity:1}
-
-@media(max-width:768px){
-  nav{padding:14px 20px}.nav-links{display:none;flex-direction:column;position:absolute;top:100%;left:0;right:0;background:rgba(8,9,13,.98);padding:16px;gap:12px;border-bottom:1px solid var(--border)}.nav-links.open{display:flex}.hbg{display:block}
-  section{padding:52px 18px}.divider{margin:0 18px}.hero{padding:108px 18px 52px}
-  .about-grid,.how-grid,.feat-big,.target-grid,.evg{grid-template-columns:1fr}
-  .how-grid{grid-template-columns:1fr 1fr}
-  .demo-inner{grid-template-columns:1fr}.demo-left{border-right:none;border-bottom:1px solid var(--border)}
-  .ps{grid-template-columns:44px 1fr;gap:12px}.tcs{grid-template-columns:1fr}
-  footer{padding:32px 18px;flex-direction:column;align-items:flex-start}.ftr{text-align:left}
-  .rtg-row{grid-template-columns:130px 1fr 34px}.integ-row{flex-direction:column}
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CV AI - Din Personliga CV-fixare</title>
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --accent: #00ff9d;
+      --card: #111118;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: #e0e0e0;
+      line-height: 1.6;
+    }
+    header {
+      text-align: center;
+      padding: 120px 20px 80px;
+      background: linear-gradient(135deg, #1a0033, #0a0a0a);
+    }
+    h1 {
+      font-size: 3.8rem;
+      background: linear-gradient(90deg, #00ff9d, #00ccff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle {
+      font-size: 1.5rem;
+      margin-top: 15px;
+      opacity: 0.9;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    section {
+      padding: 80px 0;
+    }
+    h2 {
+      color: var(--accent);
+      font-size: 2.2rem;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 30px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(0, 255, 157, 0.2);
+      border-radius: 16px;
+      padding: 35px;
+      transition: 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-10px);
+      border-color: var(--accent);
+    }
+    .example-cv {
+      background: white;
+      color: #111;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      margin: 30px 0;
+    }
+    footer {
+      text-align: center;
+      padding: 60px 20px;
+      opacity: 0.8;
+    }
+  </style>
 </head>
 <body>
 
-<div class="notif" id="notif"></div>
+  <header>
+    <div class="container">
+      <h1>CV AI</h1>
+      <p class="subtitle">En AI som fixar och förbättrar ditt CV på sekunder</p>
+    </div>
+  </header>
 
-<nav>
-  <div class="nav-logo">Recruit<span>Flow</span> AI</div>
-  <ul class="nav-links" id="navLinks">
-    <li><a onclick="nTo(event,'om')">Om verktyget</a></li>
-    <li><a onclick="nTo(event,'funktioner')">Funktioner</a></li>
-    <li><a onclick="nTo(event,'malgrupp')">Målgrupp</a></li>
-    <li><a onclick="nTo(event,'begransningar')">Begränsningar</a></li>
-    <li><a onclick="nTo(event,'process')">Process</a></li>
-    <li><a onclick="nTo(event,'utvardering')">Utvärdering</a></li>
-  </ul>
-  <button class="hbg" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
-</nav>
+  <div class="container">
 
-<!-- HERO -->
-<div class="hero">
-  <div class="hero-grid"></div>
-  <div class="hero-glow"></div>
-  <div class="hero-tag">🎓 Skoluppgift — AI-verktygsanalys</div>
-  <h1><strong>Recruit</strong><em>Flow</em> <strong>AI</strong></h1>
-  <p class="hero-sub">Automatiserad CV-bearbetning för rekryteringsbyråer</p>
-  <p class="hero-desc">En djupdykning i ett AI-drivet verktyg som automatiserar formatering, varumärkesanpassning och anonymisering av CV:n — och sparar rekryterare timmar av manuellt arbete varje dag.</p>
-  <div class="hero-chips">
-    <span class="chip blue">GDPR-kompatibelt</span>
-    <span class="chip green">Zero-retention policy</span>
-    <span class="chip">ATS-kompatibelt</span>
-    <span class="chip">UK · ANZ · EU</span>
-  </div>
-  <div class="hero-stats">
-    <div class="hstat"><div class="n">90%</div><div class="l">Tidsbesparing</div></div>
-    <div class="hstat"><div class="n">100%</div><div class="l">GDPR-säkert</div></div>
-    <div class="hstat"><div class="n">3</div><div class="l">Integrationer</div></div>
-    <div class="hstat"><div class="n">0</div><div class="l">Data sparas</div></div>
-  </div>
-  <div class="scroll-hint" onclick="gTo('om')"><div class="scroll-line"></div>Scrolla</div>
-</div>
-<hr class="divider"/>
-
-<!-- 01 OM -->
-<section id="om">
-  <div class="slbl reveal">01 — Om verktyget</div>
-  <h2 class="reveal">Vad är <em>RecruitFlow AI?</em></h2>
-  <p class="lead reveal">RecruitFlow AI är ett automatiserat verktyg för rekryteringsbyråer som tar hand om hela CV-bearbetningskedjan — från rörig PDF till professionellt, varumärkesanpassat dokument redo att skickas till kund.</p>
-  <div class="about-grid reveal">
-    <div class="about-cell">
-      <div class="icon">🏢</div>
-      <h3>Skapare & bakgrund</h3>
-      <p>Verktyget är utvecklat specifikt för rekryteringsbranschen i <strong>UK, Australien, Nya Zeeland (ANZ) och Europa (EU)</strong>. Det löser ett konkret vardagsproblem: rekryterare spenderar enormt mycket tid på att manuellt formatera och anonymisera CV:n inför klientpresentationer.</p>
-    </div>
-    <div class="about-cell">
-      <div class="icon">🎯</div>
-      <h3>Syfte & nytta</h3>
-      <p>Syftet är att <strong>eliminera manuellt CV-arbete</strong>. Verktyget omvandlar automatiskt ostädade PDF:er eller Word-dokument till professionellt formaterade, ATS-kompatibla CV:n med byråns egen grafiska profil — på sekunder istället för minuter.</p>
-    </div>
-    <div class="about-cell">
-      <div class="icon">⚙️</div>
-      <h3>Tekniken bakom</h3>
-      <p>Verktyget använder <em style="color:var(--blue)">AI och NLP</em> (Natural Language Processing) för att förstå CV-strukturer, identifiera personuppgifter och applicera layoutregler. Det inkluderar <strong>OCR-teknik</strong> för att läsa inskannade dokument och tabelldetektering för att normalisera rörig formatering.</p>
-    </div>
-    <div class="about-cell">
-      <div class="icon">🔐</div>
-      <h3>Integritet & säkerhet</h3>
-      <p>Verktyget följer en strikt <strong>zero-retention policy</strong> — alla uppladdade filer raderas omedelbart efter bearbetning. Det är fullständigt <strong>GDPR-kompatibelt</strong> och stödjer blind hiring-kulturen genom automatisk anonymisering av personuppgifter.</p>
-    </div>
-  </div>
-</section>
-<hr class="divider"/>
-
-<!-- 02 HUR DET FUNGERAR -->
-<section id="hur">
-  <div class="slbl reveal">02 — Hur det fungerar</div>
-  <h2 class="reveal">Från rörigt CV<br>till <em>perfekt dokument</em></h2>
-  <p class="lead reveal">Processen är helt automatiserad och tar bara sekunder. Här är de tre stegen som förvandlar ett ostädat CV till ett professionellt kundklart dokument.</p>
-
-  <div class="how-grid reveal">
-    <div class="how-cell">
-      <span class="how-icon">📄</span>
-      <div class="how-num">01</div>
-      <h4>Ladda upp CV</h4>
-      <p>Skicka in CV:t via webb, API eller direkt från din inkorg via e-post. Stödjer PDF, Word och inskannade dokument.</p>
-    </div>
-    <div class="how-cell">
-      <span class="how-icon">🤖</span>
-      <div class="how-num">02</div>
-      <h4>AI bearbetar</h4>
-      <p>Verktyget tar bort tabeller, normaliserar typsnitt, standardiserar layout och strippar personuppgifter automatiskt.</p>
-    </div>
-    <div class="how-cell">
-      <span class="how-icon">✅</span>
-      <div class="how-num">03</div>
-      <h4>Redo för kund</h4>
-      <p>Ett professionellt, varumärkesanpassat och ATS-kompatibelt CV levereras — klart att skicka till klienten.</p>
-    </div>
-    <div class="how-cell">
-      <span class="how-icon">🕵️</span>
-      <div class="how-num">04</div>
-      <h4>Anonymisering</h4>
-      <p>Namn, e-post, telefon, foto och exakterade examensår tas bort automatiskt för blind hiring och GDPR-efterlevnad.</p>
-    </div>
-    <div class="how-cell">
-      <span class="how-icon">🎨</span>
-      <div class="how-num">05</div>
-      <h4>Varumärkesanpassning</h4>
-      <p>CV:t formateras med byråns grafiska profil — logotyp, typsnitt, färger och layout matchar er house style.</p>
-    </div>
-    <div class="how-cell">
-      <span class="how-icon">🗑️</span>
-      <div class="how-num">06</div>
-      <h4>Zero-retention</h4>
-      <p>Filen raderas omedelbart efter leverans. Ingen data sparas någonsin — varken kandidatdata eller bearbetade filer.</p>
-    </div>
-  </div>
-
-  <!-- LIVE DEMO MOCKUP -->
-  <div class="demo-wrap reveal" style="margin-top:44px;">
-    <div class="demo-bar">
-      <div class="dbd" style="background:#E85A4A"></div>
-      <div class="dbd" style="background:#D4A017"></div>
-      <div class="dbd" style="background:#4ACF8A"></div>
-      <div class="durl">📄 RecruitFlow AI — CV-bearbetning i realtid</div>
-    </div>
-    <div class="demo-inner">
-      <div class="demo-left">
-        <div class="demo-label">Innan — Rått CV</div>
-        <div class="cv-before">
-          <div class="cb-badge">⚠ Ej bearbetat</div>
-          <div class="cv-name removed">Emma Johansson</div>
-          <div class="removed" style="font-size:.7rem">emma.johansson@gmail.com · 070-123 45 67</div>
-          <div class="removed" style="font-size:.7rem">📷 [Profilfoto]</div>
-          <div class="cv-section">
-            <div class="cv-section-title">Erfarenhet</div>
-            <div>Senior Developer — TechCorp AB</div>
-            <div style="font-size:.7rem;color:rgba(107,118,148,.7)">2019–2023 · Stockholm</div>
-          </div>
-          <div class="cv-section">
-            <div class="cv-section-title">Utbildning</div>
-            <div>KTH — Civilingenjör, <span class="removed">examen 2019</span></div>
-          </div>
-          <div style="margin-top:10px;font-size:.7rem;color:rgba(107,118,148,.5)">[Rörig tabelllayout] [Inkonsekvent typsnitt] [Ej ATS-kompatibel]</div>
+    <section>
+      <h2>Om CV AI</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Vem har skapat det?</h3>
+          <p>CV AI är ett konceptuellt AI-verktyg utvecklat med hjälp av stora språkmodeller som ChatGPT, Claude och Grok.</p>
         </div>
-
-        <button class="process-btn" onclick="runDemo()">▶ Kör AI-bearbetning</button>
-      </div>
-
-      <div style="display:flex;align-items:center;justify-content:center;padding:16px;">
-        <div style="font-size:2rem;color:var(--blue)" id="demoArrow">→</div>
-      </div>
-
-      <div class="demo-right">
-        <div class="demo-label">Efter — Bearbetat CV</div>
-        <div class="cv-after" id="cvAfter" style="opacity:.35">
-          <div class="ca-badge">✓ Redo för kund</div>
-          <div class="anon-box" style="margin-bottom:8px">🕵️ Kandidat #2847 — Anonymiserad</div>
-          <div style="font-size:.7rem;color:var(--muted);margin-bottom:2px">
-            <span class="anon-box">Kontaktuppgifter dolda</span>
-          </div>
-          <div class="cv-section">
-            <div class="cv-section-title highlight">Erfarenhet</div>
-            <div class="highlight">Senior Developer — TechCorp AB</div>
-            <div style="font-size:.7rem;color:var(--muted)">4 år · Stockholm</div>
-          </div>
-          <div class="cv-section">
-            <div class="cv-section-title highlight">Utbildning</div>
-            <div class="highlight">KTH — Civilingenjör</div>
-            <div style="font-size:.7rem"><span class="anon-box">Examensår dolt</span></div>
-          </div>
-          <div style="margin-top:12px;font-size:.7rem;color:var(--green)">✓ ATS-kompatibel · ✓ Byråns profil · ✓ GDPR-säker</div>
+        <div class="card">
+          <h3>Syfte</h3>
+          <p>Hjälpa jobbseekers att skapa professionella, moderna och anpassade CV:n snabbt och effektivt.</p>
         </div>
-        <div id="demoStatus" style="font-size:.76rem;color:var(--muted);text-align:center">Tryck på knappen för att se bearbetningen</div>
-      </div>
-    </div>
-  </div>
-</section>
-<hr class="divider"/>
-
-<!-- 03 FUNKTIONER -->
-<section id="funktioner">
-  <div class="slbl reveal">03 — Funktioner</div>
-  <h2 class="reveal">Vad <em>erbjuder</em><br>verktyget?</h2>
-  <p class="lead reveal">RecruitFlow AI kombinerar fyra kärnfunktioner som täcker hela CV-arbetsflödet för rekryteringsbyråer.</p>
-
-  <div class="feat-big reveal">
-    <div class="feat-card">
-      <div class="fc-icon">🎨</div>
-      <h3>Formatering & varumärke</h3>
-      <p>Omvandlar röriga PDF:er och Word-dokument till professionellt formaterade CV:n med byråns grafiska profil. Tar bort tabeller, normaliserar typsnitt och standardiserar layouten.</p>
-      <div class="feat-tags">
-        <span class="ftag">PDF → Word</span>
-        <span class="ftag">House style</span>
-        <span class="ftag">Tabellborttagning</span>
-        <span class="ftag">Teckensnittsharmonisering</span>
-      </div>
-    </div>
-    <div class="feat-card">
-      <div class="fc-icon">🕵️</div>
-      <h3>Anonymisering & GDPR</h3>
-      <p>Tar automatiskt bort all identifierbar information: namn, e-post, telefonnummer, foton och examensår. Stödjer blind hiring och uppfyller GDPR-krav fullt ut.</p>
-      <div class="feat-tags">
-        <span class="ftag green">GDPR-kompatibel</span>
-        <span class="ftag green">Blind hiring</span>
-        <span class="ftag green">Auto-anonymisering</span>
-        <span class="ftag green">Zero-retention</span>
-      </div>
-    </div>
-    <div class="feat-card">
-      <div class="fc-icon">🔗</div>
-      <h3>ATS-kompatibilitet</h3>
-      <p>De bearbetade CV:na är kompatibla med de populäraste ATS-systemen som används av rekryteringsbyråer i UK, ANZ och EU — inga manuella justeringar behövs.</p>
-      <div class="feat-tags">
-        <span class="ftag">UK ATS</span>
-        <span class="ftag">ANZ ATS</span>
-        <span class="ftag">EU ATS</span>
-        <span class="ftag">Bullhorn</span>
-        <span class="ftag">Vincere</span>
-      </div>
-    </div>
-    <div class="feat-card">
-      <div class="fc-icon">⚡</div>
-      <h3>Tre integrationsvägar</h3>
-      <p>Verktyget kan användas via webgränssnitt, API-integration i befintliga system, eller direkt från e-postinkorgen — rekryteraren behöver aldrig lämna sitt vanliga arbetsflöde.</p>
-      <div class="feat-tags">
-        <span class="ftag">Web UI</span>
-        <span class="ftag">REST API</span>
-        <span class="ftag">E-post / Inkorg</span>
-        <span class="ftag">Webhook</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Integrations -->
-  <div class="integ-row reveal">
-    <div class="integ-card">
-      <div class="ii">🌐</div>
-      <h4>Webb</h4>
-      <p>Ladda upp direkt i webbgränssnittet. Ingen installation — fungerar i alla webbläsare.</p>
-    </div>
-    <div class="integ-card">
-      <div class="ii">🔌</div>
-      <h4>API</h4>
-      <p>Integrera direkt i ert ATS eller CRM via REST API. Automatisera hela arbetsflödet.</p>
-    </div>
-    <div class="integ-card">
-      <div class="ii">📧</div>
-      <h4>E-post / Inkorg</h4>
-      <p>Vidarebefordra ett CV till en speciell adress — få det bearbetat direkt i inkorgen.</p>
-    </div>
-  </div>
-</section>
-<hr class="divider"/>
-
-<!-- 04 MÅLGRUPP -->
-<section id="malgrupp">
-  <div class="slbl reveal">04 — Målgrupp</div>
-  <h2 class="reveal">Vem är verktyget<br><em>till för?</em></h2>
-  <p class="lead reveal">Verktyget riktar sig specifikt till rekryteringsbranschen och de roller som dagligen hanterar stora volymer av CV:n.</p>
-  <div class="target-grid reveal">
-    <div class="tcard">
-      <div class="te">🏢</div>
-      <h4>Rekryteringsbyråer</h4>
-      <p>Byråer i UK, ANZ och EU som hanterar hundratals CV:n per vecka. Sparar rekryterarna timmar av manuellt formateringsarbete dagligen.</p>
-    </div>
-    <div class="tcard">
-      <div class="te">👔</div>
-      <h4>Rekryterare & headhunters</h4>
-      <p>Individuella rekryterare som snabbt behöver presentera kandidater för klienter med professionella, varumärkesanpassade CV:n.</p>
-    </div>
-    <div class="tcard">
-      <div class="te">🏗️</div>
-      <h4>Staffingbolag</h4>
-      <p>Bemanning- och staffingföretag som hanterar stora volymer av kandidater och behöver ett skalbart, automatiserat arbetsflöde.</p>
-    </div>
-    <div class="tcard">
-      <div class="te">⚖️</div>
-      <h4>HR-avdelningar</h4>
-      <p>Interna HR-team som vill implementera blind hiring och säkerställa GDPR-efterlevnad i rekryteringsprocessen.</p>
-    </div>
-    <div class="tcard">
-      <div class="te">💻</div>
-      <h4>Tech-bolag</h4>
-      <p>Teknikföretag med hög anställningsvolym som vill integrera CV-bearbetning direkt i sitt ATS via API.</p>
-    </div>
-    <div class="tcard">
-      <div class="te">🌍</div>
-      <h4>Globala aktörer</h4>
-      <p>Internationella rekryteringsbyråer med verksamhet i flera marknader som behöver enhetlig CV-presentation.</p>
-    </div>
-  </div>
-</section>
-<hr class="divider"/>
-
-<!-- 05 BEGRÄNSNINGAR -->
-<section id="begransningar">
-  <div class="slbl reveal">05 — Begränsningar</div>
-  <h2 class="reveal">Vad bör man<br><em>känna till?</em></h2>
-  <p class="lead reveal">Alla verktyg har sina gränser. Här är en transparent genomgång av kända begränsningar, kostnader och versioner.</p>
-  <table class="ltbl reveal">
-    <thead><tr><th>Begränsning</th><th>Detaljer</th><th>Status</th></tr></thead>
-    <tbody>
-      <tr><td><strong>Prissättning</strong></td><td>Verktyget är en betaltjänst riktad mot professionella byråer. Ingen permanent gratisversion — provperiod kan erbjudas. Priset baseras vanligtvis på volym (antal CV per månad).</td><td><span class="badge bw">Betaltjänst</span></td></tr>
-      <tr><td><strong>Anonymiseringens precision</strong></td><td>AI:n kan missa ovanliga namn eller personuppgifter i icke-standardformat. Manuell granskning rekommenderas vid kritiska ärenden.</td><td><span class="badge by">Varierar</span></td></tr>
-      <tr><td><strong>Formatstöd</strong></td><td>Fungerar bäst med PDF och Word (.docx). Äldre format (.doc) och starkt kreativa layouter kan ge sämre resultat.</td><td><span class="badge by">Begränsat</span></td></tr>
-      <tr><td><strong>Anpassning av house style</strong></td><td>Initial setup av byråns grafiska profil kräver konfiguration — inte plug-and-play för alla. Kan kräva teknisk support vid uppstart.</td><td><span class="badge by">Setup krävs</span></td></tr>
-      <tr><td><strong>Språkstöd</strong></td><td>Bäst resultat på engelska. Stöd för andra språk (svenska, franska, tyska) finns men AI:ns förståelse av icke-engelska CV-strukturer är sämre.</td><td><span class="badge by">Engelska primärt</span></td></tr>
-      <tr><td><strong>API-komplexitet</strong></td><td>API-integrationen kräver teknisk kompetens. Lämplig för byråer med utvecklarresurser — inte för alla.</td><td><span class="badge bw">Teknisk</span></td></tr>
-      <tr><td><strong>Zero-retention = ingen historik</strong></td><td>Zero-retention-policyn innebär att inga filer sparas — du kan inte gå tillbaka och hämta ett tidigare bearbetat CV.</td><td><span class="badge bi">Designat så</span></td></tr>
-      <tr><td><strong>Internetberoende</strong></td><td>Molnbaserat verktyg — kräver stabil internetuppkoppling. Inget offlineläge tillgängligt.</td><td><span class="badge bw">Online only</span></td></tr>
-    </tbody>
-  </table>
-</section>
-<hr class="divider"/>
-
-<!-- 06 PROCESS -->
-<section id="process">
-  <div class="slbl reveal">06 — Processens dokumentation</div>
-  <h2 class="reveal">Hur gick arbetet<br><em>till?</em></h2>
-  <p class="lead reveal">Dokumentation av de steg som togs för att hitta, testa, analysera och presentera RecruitFlow AI.</p>
-  <div class="ptl">
-    <div class="ps reveal">
-      <div class="pn">1</div>
-      <div class="pc">
-        <h4>Hitta och välja verktyget</h4>
-        <p>Sökte efter AI-verktyg för rekryteringsbranschen. CV-bearbetning och anonymisering valdes som område eftersom det är ett konkret, mätbart problem med tydlig AI-nytta.</p>
-        <div class="ibox">🔍 Sökte på "AI CV formatting tool recruitment agency GDPR" — hittade flera aktörer i nischen. Verktyget valdes för att det kombinerar tre distinkta AI-funktioner (formatering, varumärke, anonymisering) och har tydlig geografisk målgrupp.</div>
-      </div>
-    </div>
-    <div class="ps reveal">
-      <div class="pn">2</div>
-      <div class="pc">
-        <h4>Analysera kärnfunktionerna</h4>
-        <p>Gick igenom varje funktion i detalj för att förstå hur AI:n används och vilket värde det skapar.</p>
-        <div class="tcs">
-          <div class="tc"><div class="ti">🎨</div><div class="tl">Funktion 1</div><div class="td">Formatering & house style</div><div class="tr2 ok">✓ Tydlig nytta</div></div>
-          <div class="tc"><div class="ti">🕵️</div><div class="tl">Funktion 2</div><div class="td">Anonymisering & GDPR</div><div class="tr2 ok">✓ Kritisk för branschen</div></div>
-          <div class="tc"><div class="ti">🔗</div><div class="tl">Funktion 3</div><div class="td">ATS-kompatibilitet</div><div class="tr2 ok">✓ Spar tid</div></div>
+        <div class="card">
+          <h3>Målgrupp</h3>
+          <p>Studenter, nyexaminerade, personer som vill byta jobb och alla som vill förbättra sitt CV.</p>
         </div>
       </div>
-    </div>
-    <div class="ps reveal">
-      <div class="pn">3</div>
-      <div class="pc">
-        <h4>Granska integrationsalternativen</h4>
-        <p>Utvärderade de tre integrationsmetoderna — webb, API och e-post — och hur de passar olika typer av rekryteringsbyråer.</p>
-        <div class="ibox">📧 E-postintegrationen är särskilt smart: rekryterare vidarebefordrar ett CV till en dedikerad adress och får det bearbetat direkt i inkorgen. Det kräver noll förändring av arbetsflödet — en extremt låg tröskel för adoption.</div>
+    </section>
+
+    <section>
+      <h2>Hur fungerar det?</h2>
+      <p style="text-align:center; font-size:1.2rem; max-width:800px; margin:0 auto 40px;">
+        Du skriver in dina uppgifter → AI:n analyserar dem → genererar ett snyggt, professionellt CV anpassat efter den bransch du söker jobb inom.
+      </p>
+    </section>
+
+    <section>
+      <h2>Exempel på genererat CV</h2>
+      <div class="example-cv">
+        <h1 style="text-align:center; font-size:2.8rem; margin-bottom:8px;">Anna Lindberg</h1>
+        <p style="text-align:center; color:#555; font-size:1.3rem;">Junior Webbutvecklare & Designer</p>
+        
+        <h2 style="border-bottom:2px solid #00ff9d; padding-bottom:8px; margin:30px 0 15px;">Utbildning</h2>
+        <p><strong>Kandidatprogram i Digital Design</strong><br>
+        Malmö Universitet • 2022 – 2025</p>
+
+        <h2 style="border-bottom:2px solid #00ff9d; padding-bottom:8px; margin:30px 0 15px;">Arbetslivserfarenhet</h2>
+        <p><strong>Webbpraktikant</strong> — Digitalbyrå AB<br>
+        Juni 2024 – Jan 2025<br>
+        • Utveckling av responsiva webbplatser<br>
+        • Design och optimering av användargränssnitt</p>
+
+        <h2 style="border-bottom:2px solid #00ff9d; padding-bottom:8px; margin:30px 0 15px;">Färdigheter</h2>
+        <p>HTML5 • CSS3 • JavaScript • Figma • React • UX/UI • Git</p>
       </div>
-    </div>
-    <div class="ps reveal">
-      <div class="pn">4</div>
-      <div class="pc">
-        <h4>Utvärdera GDPR och blind hiring</h4>
-        <p>Undersökte djupare hur zero-retention-policyn fungerar och vad blind hiring innebär i praktiken.</p>
-        <div class="ibox">⚖️ Zero-retention innebär att filer raderas omedelbart efter bearbetning — varken rådata eller bearbetade filer sparas. Det är ett starkt GDPR-argument men skapar begränsning: ingen historik. Blind hiring (att dölja identitet) är en växande trend i UK och ANZ för att motverka omedveten diskriminering.</div>
-      </div>
-    </div>
-    <div class="ps reveal">
-      <div class="pn">5</div>
-      <div class="pc">
-        <h4>Bygga webbsidan</h4>
-        <p>All information sammanställdes till denna presentationssida för GitHub Pages.</p>
-        <div class="ibox" style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;">
-          <div><strong style="color:var(--text)">Claude (Anthropic)</strong><br><span>Textgenerering, struktur & HTML/CSS</span></div>
-          <div style="border-left:1px solid var(--border);padding-left:14px;"><strong style="color:var(--blue)">GitHub Pages</strong><br><span>Hosting av sidan</span></div>
+    </section>
+
+    <section>
+      <h2>Styrkor & Begränsningar</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Styrkor</h3>
+          <ul>
+            <li>Snabbt och enkelt</li>
+            <li>Anpassar CV efter jobbannons</li>
+            <li>Modern och professionell design</li>
+            <li>Hjälper till med formuleringar</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Begränsningar</h3>
+          <ul>
+            <li>Kräver att du matar in korrekt information</li>
+            <li>Gratisversioner har begränsat antal CV per månad</li>
+            <li>Kan inte ersätta personlig touch helt</li>
+            <li>Vissa AI-verktyg kostar pengar för bättre resultat</li>
+          </ul>
         </div>
       </div>
-    </div>
-  </div>
-</section>
-<hr class="divider"/>
+    </section>
 
-<!-- 07 UTVÄRDERING -->
-<section id="utvardering">
-  <div class="slbl reveal">07 — Utvärdering</div>
-  <h2 class="reveal">Vad är mitt<br><em>omdöme?</em></h2>
-  <p class="lead reveal">En balanserad bedömning baserad på analys av verktygets funktioner, målgrupp och marknadspotential.</p>
+    <section>
+      <h2>Min Analys</h2>
+      <p>Jag testade att använda Claude och ChatGPT för att generera CV. Resultatet blev bra men behövde ofta finjusteringar. Ett dedikerat CV AI-verktyg skulle spara mycket tid och ge mer konsekventa resultat. Detta är ett mycket användbart verktyg för studenter och jobbseekers.</p>
+    </section>
 
-  <div class="evg reveal">
-    <div class="evc pos">
-      <h4>✓ Styrkor</h4>
-      <ul class="evl">
-        <li>Löser ett konkret, tidskrävande problem med tydligt mätbar ROI</li>
-        <li>Tre integrationsvägar gör adoption extremt smidig</li>
-        <li>Zero-retention policy är ett starkt GDPR-argument</li>
-        <li>Stödjer blind hiring — relevant och växande trend</li>
-        <li>E-postintegrationen kräver noll förändring av arbetsflödet</li>
-        <li>Specifikt anpassat för UK, ANZ och EU-marknaden</li>
-      </ul>
-    </div>
-    <div class="evc neg">
-      <h4>⚠ Svagheter</h4>
-      <ul class="evl">
-        <li>Betaltjänst — prismodellen kan utesluta mindre byråer</li>
-        <li>Anonymiseringen kan missa ovanliga namnformat</li>
-        <li>API-integrationen kräver teknisk kompetens</li>
-        <li>Sämre stöd för icke-engelska CV-strukturer</li>
-        <li>Zero-retention = ingen historik — kan vara ett problem</li>
-        <li>Initial konfiguration av house style kräver setup-tid</li>
-      </ul>
-    </div>
   </div>
 
-  <div style="margin-top:44px" class="reveal">
-    <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;margin-bottom:24px">Betygsättning — skala 1–10</h3>
-    <div class="rtg-bar">
-      <div class="rtg-row"><span class="rtg-lbl">Nischvärde & nytta</span><div class="rtg-trk"><div class="rtg-fill" style="width:96%"></div></div><span class="rtg-sc">9.6</span></div>
-      <div class="rtg-row"><span class="rtg-lbl">GDPR & integritet</span><div class="rtg-trk"><div class="rtg-fill" style="width:95%"></div></div><span class="rtg-sc">9.5</span></div>
-      <div class="rtg-row"><span class="rtg-lbl">Integrationsmöjligheter</span><div class="rtg-trk"><div class="rtg-fill" style="width:90%"></div></div><span class="rtg-sc">9.0</span></div>
-      <div class="rtg-row"><span class="rtg-lbl">Användarvänlighet</span><div class="rtg-trk"><div class="rtg-fill" style="width:80%"></div></div><span class="rtg-sc">8.0</span></div>
-      <div class="rtg-row"><span class="rtg-lbl">Precisionsgrad (AI)</span><div class="rtg-trk"><div class="rtg-fill" style="width:75%"></div></div><span class="rtg-sc">7.5</span></div>
-      <div class="rtg-row"><span class="rtg-lbl">Värde för pengarna</span><div class="rtg-trk"><div class="rtg-fill" style="width:78%"></div></div><span class="rtg-sc">7.8</span></div>
-      <div class="rtg-row" style="border-top:1px solid var(--border);padding-top:12px;margin-top:2px">
-        <span class="rtg-lbl" style="font-weight:600;color:var(--text)">Totalt omdöme</span>
-        <div class="rtg-trk"><div class="rtg-fill" style="width:87%;background:linear-gradient(to right,var(--blue),var(--bl))"></div></div>
-        <span class="rtg-sc" style="font-size:1rem">8.7</span>
-      </div>
-    </div>
-  </div>
+  <footer>
+    <p>Inlämning - Artificiell Intelligens 1 • 26 maj 2026</p>
+    <p>Ditt Namn • Inspirerad av TAAFT</p>
+  </footer>
 
-  <div class="concl reveal">
-    <div class="cl">Slutsats</div>
-    <p>RecruitFlow AI är ett <em style="color:var(--bl)">exceptionellt välriktat verktyg</em> som löser ett konkret och mätbart problem för en specifik bransch.</p>
-    <p>Det som gör det starkt är kombinationen av automatisering, GDPR-efterlevnad och låg adoptionstruktur — särskilt e-postintegrationen som kräver noll förändring av befintliga arbetsflöden. Begränsningarna är relativt små i förhållande till nyttan. För rekryteringsbyråer i UK, ANZ och EU som hanterar CV-volymer är detta ett verktyg som med stor sannolikhet betalar sig självt på några dagars tidsbesparingar.</p>
-  </div>
-</section>
-
-<footer>
-  <div>
-    <div class="ftl">Recruit<span>Flow</span> AI</div>
-    <p class="fp">Skoluppgift: Presentation och utvärdering av ett AI-verktyg.<br>Skapad med HTML & CSS. Claude (Anthropic) användes för textgenerering och kodproduktion.</p>
-  </div>
-  <div class="ftr">
-    <p>Analyserat verktyg: CV-bearbetning för rekryteringsbyråer</p>
-    <p>Kursuppgift — Teknik & AI</p>
-    <p style="margin-top:6px;color:rgba(107,118,148,.4);font-size:.69rem">© 2025 — Skapad för utbildningsändamål</p>
-  </div>
-</footer>
-
-<script>
-function nTo(e,id){e.preventDefault();gTo(id);document.getElementById('navLinks').classList.remove('open')}
-function gTo(id){const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'})}
-(()=>{const o=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.07});document.querySelectorAll('.reveal').forEach(r=>o.observe(r))})();
-function notif(m){const n=document.getElementById('notif');n.textContent=m;n.classList.add('show');setTimeout(()=>n.classList.remove('show'),2800)}
-
-// Demo animation
-let demoRunning = false;
-function runDemo(){
-  if(demoRunning) return;
-  demoRunning = true;
-  const after = document.getElementById('cvAfter');
-  const status = document.getElementById('demoStatus');
-  const arrow = document.getElementById('demoArrow');
-
-  after.style.opacity = '.35';
-  status.textContent = '⏳ AI analyserar CV…';
-  status.style.color = 'var(--blue)';
-  arrow.textContent = '⟳';
-  arrow.style.animation = 'spin 1s linear infinite';
-
-  const steps = [
-    [800,  '🔍 Identifierar personuppgifter…'],
-    [1600, '✂️ Tar bort tabeller och normaliserar layout…'],
-    [2400, '🎨 Applicerar byråns grafiska profil…'],
-    [3200, '🕵️ Anonymiserar namn, e-post och foto…'],
-    [4000, '✅ Bearbetar klart — GDPR-kontroll…'],
-  ];
-
-  steps.forEach(([delay, msg]) => {
-    setTimeout(()=>{ status.textContent = msg; }, delay);
-  });
-
-  setTimeout(()=>{
-    after.style.opacity = '1';
-    after.style.transition = 'opacity .5s ease';
-    status.textContent = '✓ Klar! CV bearbetat, anonymiserat och redo för kund.';
-    status.style.color = 'var(--green)';
-    arrow.textContent = '→';
-    arrow.style.animation = '';
-    notif('✓ CV bearbetat på 4.8 sekunder!');
-    demoRunning = false;
-  }, 4800);
-}
-</script>
 </body>
 </html>
